@@ -1,0 +1,43 @@
+server:
+  port: 8668
+
+spring:
+  application:
+    name: kob-admin-all
+  freemarker:
+    template-loader-path: classpath:/templates/
+    suffix:
+  mvc:
+    static-path-pattern: /static/**
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://localhost_mysql:3306/kob?useUnicode=yes&characterEncoding=UTF8
+    driver-class-name: com.mysql.jdbc.Driver
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+# 控制台日志不看就注释此行
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+debug: false
+
+kob:
+  cluster: incubator
+  core:
+    zk_servers: localhost_zk:2801
+    zk_session_timeout: 10000
+    zk_connection_timeout: 16000
+  server:
+    cluster: incubator
+    zk_servers: localhost_zk:2801
+    zk_session_timeout: 10000
+    zk_connection_timeout: 16000
+    task_push_threads: 36
+    interval_min: 10
+    waiting_task_scroll: 100
+  processor:
+    task_push_threads: 36
+    interval_min: 10
+    waiting_task_scroll: 100
