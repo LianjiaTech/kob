@@ -1,0 +1,15 @@
+server:
+  port: 8066
+
+kob.client:
+  env: official_develop
+  project_code: kob_monitor
+
+#客户端快速实现配置的一种方式 详见：com.ke.kob.client.spring.env.OfficialDevelop
+#或
+#kob.client:
+#  cluster: incubator
+#  project_code: kob_monitor
+#  zk_servers: localhost_zk:2801
+#  admin_url: http://localhost:8668
+#  log_warn_enable: true

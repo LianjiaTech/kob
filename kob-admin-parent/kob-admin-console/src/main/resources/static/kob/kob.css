@@ -1,0 +1,34 @@
+*,a:focus{
+    outline: none;
+}
+*,a:hover{
+    text-decoration: none;
+}
+.dropdown-menu>li>a{
+    margin: 4px;
+    line-height: 25px;
+}
+.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+    background-color: #c5c5c5;
+}
+.footable.breakpoint > tbody > tr > td > span.footable-toggle {
+    position: relative;
+    top: 1px;
+}
+.table>tfoot>tr>td{
+    padding: 16px 6px 0;
+}
+.panel-black {
+    border-color: #24292e;
+}
+.panel-black > .panel-heading {
+    border-color: #24292e;
+    color: white;
+    background-color: #24292e;
+}
+.panel-black > a {
+    color: #24292e;
+}
+.panel-black > a:hover {
+    color: black;
+}
