@@ -102,7 +102,7 @@ public @Slf4j class TaskDispatcher {
         Long triggerTime = context.getTriggerTime();
         if (triggerTime != null) {
             Date now = new Date();
-            if (new Date(triggerTime + expireTime).after(now)) {
+            if (new Date(triggerTime - expireTime).after(now)) {
                 if (zkClient.exists(fullPath)) {
                     if (zkClient.delete(fullPath)) {
                         if (client.getLogWarnEnable()) {
