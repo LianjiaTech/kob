@@ -43,8 +43,8 @@ Kob作业平台，以把任务组装成作业的思想，动态配置作业需�
 4. kob-basic 服务端（ kob-admin-* ）、客户端（ kob-client-* ）公用jar包。
 5. kob-client-demo-spring-boot 客户端springboot的一种接入形式。
 6. kob-client-parent 作业调度客户端项目依赖jar包。
-① kob-client-spring 客户端spring项目依赖jar，会被kob-client-spring-boot-starter依赖。
-② kob-client-spring-boot-starter 客户端spring-boot项目依赖jar。
+     kob-client-spring 客户端spring项目依赖jar，会被kob-client-spring-boot-starter依赖。
+     kob-client-spring-boot-starter 客户端spring-boot项目依赖jar。
 7. table.sql 以集群名称是incubating，生成的sql文件
 ```
 
@@ -56,8 +56,8 @@ mvn clean install -DskipTests
 ##### pom依赖 
 ```
 <dependency>
-<groupId>com.ke</groupId>
-<artifactId>kob-client-spring-boot-starter</artifactId>
+  <groupId>com.ke</groupId>
+  <artifactId>kob-client-spring-boot-starter</artifactId>
 </dependency>
 ```
 ##### 创建项目 
