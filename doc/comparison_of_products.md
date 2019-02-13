@@ -1,1 +1,3 @@
-![Image text](https://github.com/crystalChen/kob/blob/master/docs/comparison.png)
+##竞品分析
+
+![Image text](/doc/comparison.png)
