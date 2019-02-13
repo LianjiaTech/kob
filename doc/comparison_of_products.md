@@ -1,3 +1,3 @@
-##竞品分析
+## 竞品分析
 
 ![Image text](/doc/comparison.png)
