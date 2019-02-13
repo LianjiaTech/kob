@@ -1,1 +1,1 @@
-![Image text](img-folder/comparison.png)
+![Image text](https://github.com/crystalChen/kob/blob/master/img-folder/comparison.png)
