@@ -2,7 +2,6 @@
 
 # local vea
 build/
-docs/
 
 # maven ignore
 target/
