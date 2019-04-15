@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class ClientConstant {
 
-    public static final String VERSION = "0.0.3-SNAPSHOT";
+    public static final String VERSION = "1.0.0-SNAPSHOT";
     public static final int DEFAULT_ZK_SESSION_TIMEOUT = 10000;
     public static final int DEFAULT_ZK_CONNECTION_TIMEOUT = 16000;
     public static final String DEFAULT_TASK_LOG_PATH = "/collect/system_collect.json";
