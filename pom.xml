@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <jre>1.7</jre>
+        <jre>1.8</jre>
         <org.projectlombok.lombok>1.16.16</org.projectlombok.lombok>
         <com.alibaba.fastjson>1.2.32</com.alibaba.fastjson>
         <com.101tec.zkclient>0.10</com.101tec.zkclient>
@@ -143,8 +143,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>${jre}</source>
+                    <target>${jre}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
