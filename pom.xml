@@ -4,6 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.4.RELEASE</version>
+    </parent>
+
     <groupId>com.ke</groupId>
     <artifactId>kob-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
@@ -14,20 +20,19 @@
         <org.projectlombok.lombok>1.16.16</org.projectlombok.lombok>
         <com.alibaba.fastjson>1.2.32</com.alibaba.fastjson>
         <com.101tec.zkclient>0.10</com.101tec.zkclient>
-        <org.mybatis.spring.boot.mybatis-spring-boot-starter>1.2.0</org.mybatis.spring.boot.mybatis-spring-boot-starter>
+        <org.mybatis.spring.boot.mybatis-spring-boot-starter>2.0.1</org.mybatis.spring.boot.mybatis-spring-boot-starter>
         <mysql.mysql-connector-java>5.1.26</mysql.mysql-connector-java>
         <org.slf4j.slf4j-api>1.6.1</org.slf4j.slf4j-api>
-        <com.squareup.okhttp3.okhttp>3.4.2</com.squareup.okhttp3.okhttp>
-        <org.springframework.boot.spring-boot-starter-web>1.5.10.RELEASE</org.springframework.boot.spring-boot-starter-web>
-        <org.springframework.boot.spring-boot-starter-freemarker>1.5.10.RELEASE</org.springframework.boot.spring-boot-starter-freemarker>
-        <org.springframework.boot.spring-boot-starter-aop>1.5.10.RELEASE</org.springframework.boot.spring-boot-starter-aop>
-        <org.springframework.boot.spring-boot-starter-aop>1.5.10.RELEASE</org.springframework.boot.spring-boot-starter-aop>
-        <org.springframework.boot.spring-boot>1.5.10.RELEASE</org.springframework.boot.spring-boot>
-        <org.springframework.spring-context>4.3.14.RELEASE</org.springframework.spring-context>
-        <org.springframework.boot.spring-boot-maven-plugin>1.5.10.RELEASE</org.springframework.boot.spring-boot-maven-plugin>
+        <com.squareup.okhttp3.okhttp>3.14.1</com.squareup.okhttp3.okhttp>
+        <org.apache.curator.curator-client>4.2.0</org.apache.curator.curator-client>
     </properties>
     <modules>
-        <module>kob-basic</module>
+        <module>basic</module>
+        <module>server/console</module>
+        <module>server/processor</module>
+        <module>server/core</module>
+        <module>client/spring</module>
+        <module>client/spring-starter</module>
         <module>kob-admin-parent</module>
         <module>kob-client-parent</module>
         <module>kob-admin-all-spring-boot</module>
@@ -108,31 +113,6 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${com.squareup.okhttp3.okhttp}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-web</artifactId>
-                <version>${org.springframework.boot.spring-boot-starter-web}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-freemarker</artifactId>
-                <version>${org.springframework.boot.spring-boot-starter-freemarker}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-aop</artifactId>
-                <version>${org.springframework.boot.spring-boot-starter-aop}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot</artifactId>
-                <version>${org.springframework.boot.spring-boot}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-context</artifactId>
-                <version>${org.springframework.spring-context}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
