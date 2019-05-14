@@ -1,4 +1,4 @@
-CREATE TABLE `kob_job_cron_incubator` (
+CREATE TABLE `kob_job_cron` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `project_code` varchar(60) NOT NULL DEFAULT '' COMMENT '项目唯一标识',
   `project_name` varchar(60) NOT NULL DEFAULT '' COMMENT '项目中文名称',
@@ -29,7 +29,7 @@ CREATE TABLE `kob_job_cron_incubator` (
   KEY `idx_project_code` (`project_code`) USING BTREE COMMENT '普通索引:项目标识'
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='cron作业表';
 
-CREATE TABLE `kob_task_record_incubator` (
+CREATE TABLE `kob_task_record` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `project_code` varchar(60) NOT NULL DEFAULT '' COMMENT '项目唯一标识',
   `project_name` varchar(60) NOT NULL DEFAULT '' COMMENT '项目中文名称',
@@ -70,7 +70,7 @@ CREATE TABLE `kob_task_record_incubator` (
   KEY `idx_job_uuid` (`job_uuid`) USING BTREE COMMENT '普通索引:作业标识'
 ) ENGINE=InnoDB AUTO_INCREMENT=45399 DEFAULT CHARSET=utf8mb4 COMMENT='任务一览';
 
-CREATE TABLE `kob_task_waiting_incubator` (
+CREATE TABLE `kob_task_waiting` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'ID',
   `project_code` varchar(60) NOT NULL DEFAULT '' COMMENT '项目唯一标识',
   `project_name` varchar(60) NOT NULL DEFAULT '' COMMENT '项目中文名称',
@@ -80,7 +80,7 @@ CREATE TABLE `kob_task_waiting_incubator` (
   `task_key` varchar(60) NOT NULL DEFAULT '' COMMENT '任务标识,客户端而得的',
   `task_remark` varchar(60) NOT NULL DEFAULT '' COMMENT '任务备注',
   `task_type` varchar(60) NOT NULL DEFAULT '' COMMENT '任务类型',
-  `task_uuid` varchar(60) NOT NULL DEFAULT '' COMMENT '任务唯一标识kob_task_waiting_incubator',
+  `task_uuid` varchar(60) NOT NULL DEFAULT '' COMMENT '任务唯一标识kob_task_waiting',
   `relation_task_uuid` varchar(60) NOT NULL DEFAULT '' COMMENT '依赖任务标识，用于串联任务执行情况',
   `retry_type` varchar(60) NOT NULL DEFAULT '' COMMENT '重试类型 0不重试、1失败重试，2超时重试，12失败超时均重试',
   `batch_type` varchar(60) NOT NULL DEFAULT '' COMMENT '是否批处理作业 1是、0否',
@@ -97,13 +97,14 @@ CREATE TABLE `kob_task_waiting_incubator` (
   `gmt_created` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '数据库创建时间',
   `gmt_modified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '数据库更新时间',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `uniq_task_uuid` (`task_uuid`) USING BTREE COMMENT '唯一索引:任务标识',
+  UNIQUE KEY `udx_task_uuid` (`task_uuid`) USING BTREE COMMENT '唯一索引:任务标识',
+  UNIQUE KEY `udx_task` (`job_uuid`,`trigger_time`) USING BTREE COMMENT '唯一索引:任务',
   KEY `idx_trigger_time` (`trigger_time`) USING BTREE COMMENT '普通索引:触发时间',
   KEY `idx_job_uuid` (`job_uuid`) USING BTREE COMMENT '普通索引:作业标识',
   KEY `idx_project_code` (`project_code`) USING BTREE COMMENT '普通索引:项目标识'
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='等待执行任务';
 
-CREATE TABLE `kob_user_incubator` (
+CREATE TABLE `kob_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `code` varchar(100) NOT NULL DEFAULT '' COMMENT '用户账号',
   `name` varchar(100) NOT NULL DEFAULT '' COMMENT '用户姓名',
@@ -115,12 +116,12 @@ CREATE TABLE `kob_user_incubator` (
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户库，公司级可以通过账户接口替代';
 
-INSERT INTO `kob_user_incubator`(`code`, `name`, `pwd`, `configuration`)
+INSERT INTO `kob_user`(`code`, `name`, `pwd`, `configuration`)
  VALUES ('xiaoming', '小明', 'xiaoming', '{"mail":"xiaoming@ke.com"}');
-INSERT INTO `kob_user_incubator`(`code`, `name`, `pwd`, `configuration`)
+INSERT INTO `kob_user`(`code`, `name`, `pwd`, `configuration`)
  VALUES ('xiaohong', '小红', 'xiaohong', '{"mail":"xiaohong@ke.com"}');
 
-CREATE TABLE `kob_log_collect_incubator` (
+CREATE TABLE `kob_log_collect` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `state` int(6) DEFAULT NULL COMMENT '状态',
   `log_uuid` varchar(60) NOT NULL DEFAULT '' COMMENT '日志唯一标识',
@@ -138,7 +139,7 @@ CREATE TABLE `kob_log_collect_incubator` (
   KEY `idx_task_uuid` (`task_uuid`) USING BTREE COMMENT '普通索引:任务标识'
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='收集表';
 
-CREATE TABLE `kob_log_opt_incubator` (
+CREATE TABLE `kob_log_opt` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `user_code` varchar(100) NOT NULL DEFAULT '' COMMENT '账号',
   `user_name` varchar(100) NOT NULL DEFAULT '' COMMENT '姓名，用于显示',
@@ -152,7 +153,7 @@ CREATE TABLE `kob_log_opt_incubator` (
   KEY `idx_cost_time` (`cost_time`) USING BTREE COMMENT '普通索引:耗时'
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='操作日志';
 
-CREATE TABLE `kob_project_user_incubator` (
+CREATE TABLE `kob_project_user` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `user_code` varchar(50) NOT NULL DEFAULT '' COMMENT '用户账号',
   `user_name` varchar(100) NOT NULL DEFAULT '' COMMENT '用户姓名',
