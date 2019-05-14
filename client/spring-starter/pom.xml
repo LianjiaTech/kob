@@ -11,9 +11,20 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <groupId>com.ke</groupId>
-    <artifactId>spring-starter</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <artifactId>kob-spring-starter</artifactId>
+    <name>kob-spring-starter ${project.version}</name>
 
-    
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ke</groupId>
+            <artifactId>kob-client-spring</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

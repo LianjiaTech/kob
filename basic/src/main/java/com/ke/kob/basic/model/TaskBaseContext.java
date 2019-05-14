@@ -41,7 +41,7 @@ public @NoArgsConstructor class TaskBaseContext implements Comparable<TaskBaseCo
     /**
      * 定义ZK path信息
      */
-    static class Path{
+    public static class Path{
 
         /**
          * 任务方法
@@ -51,12 +51,28 @@ public @NoArgsConstructor class TaskBaseContext implements Comparable<TaskBaseCo
          * 触发时间
          */
         private @Getter @Setter Long triggerTime;
+        /**
+         * 指定执行节点 用于实时任务的灰度发布
+         */
+        private @Getter @Setter String designatedNode;
+        /**
+         * 指定执行节点 用于实时任务的灰度发布
+         */
+        private @Getter @Setter String designatedIP;
+        /**
+         * 推荐执行节点 用于节点哈希算出的推荐节点
+         */
+        private @Getter @Setter String recommendNode;
+        /**
+         * 逗号分隔排除执行节点
+         */
+        private @Getter @Setter String tryToExclusionNode;
     }
 
     /**
      * 定义ZK data信息
      */
-    static class Data{
+    public static class Data{
         /**
          * 可放一些跟踪信息
          */
@@ -77,18 +93,6 @@ public @NoArgsConstructor class TaskBaseContext implements Comparable<TaskBaseCo
          * 任务唯一标识
          */
         private @Getter @Setter String taskUuid;
-        /**
-         * 指定执行节点 用于实时任务的灰度发布
-         */
-        private @Getter @Setter String designatedNode;
-        /**
-         * 推荐执行节点 用于节点哈希算出的推荐节点
-         */
-        private @Getter @Setter String recommendNode;
-        /**
-         * 逗号分隔排除执行节点
-         */
-        private @Getter @Setter String tryToExclusionNode;
         /**
          * 用户自定义参数可以用于分片或一些其他场景
          */
