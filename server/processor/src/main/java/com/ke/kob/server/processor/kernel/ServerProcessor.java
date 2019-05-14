@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.IZkChildListener;
 import org.I0Itec.zkclient.ZkClient;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -171,7 +172,7 @@ public @NoArgsConstructor @Slf4j class ServerProcessor {
      *
      * @param projectCode 项目名称
      */
-    private void recoveryOverstockTask(String projectCode) {
+    private void recoveryOverstockTask(String projectCode) throws UnsupportedEncodingException {
         int random100 = new Random().nextInt(AdminConstant.ONE_HUNDRED);
         if (random100 < processorProperties.getTaskOverstockRecoveryWeight()) {
             List<String> taskPathList = zkClient.getChildren(ZkPathConstant.clientTaskPath(serverContext.getCluster(), projectCode));
@@ -179,7 +180,8 @@ public @NoArgsConstructor @Slf4j class ServerProcessor {
                 List<TaskBaseContext> tasks = new ArrayList<>();
                 for (String s : taskPathList) {
                     TaskBaseContext task = JSONObject.parseObject(s, TaskBaseContext.class);
-                    task.setPath(ZkPathConstant.clientTaskPath(serverContext.getCluster(), projectCode) + ZkPathConstant.BACKSLASH + s);
+                    //todo
+                    // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getCluster(), projectCode) + ZkPathConstant.BACKSLASH + s);
                     tasks.add(task);
                 }
                 Collections.sort(tasks);
