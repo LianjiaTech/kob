@@ -33,29 +33,19 @@
         <module>server/core</module>
         <module>client/spring</module>
         <module>client/spring-starter</module>
-        <module>kob-admin-parent</module>
-        <module>kob-client-parent</module>
-        <module>kob-admin-all-spring-boot</module>
-        <module>kob-admin-console-spring-boot</module>
-        <module>kob-admin-processor-spring-boot</module>
-        <module>kob-client-demo-spring-boot</module>
+        <module>demo/monitor</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-admin-console</artifactId>
+                <artifactId>kob-client-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-admin-processor</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ke</groupId>
-                <artifactId>kob-admin-core</artifactId>
+                <artifactId>kob-server-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -73,6 +63,7 @@
                 <artifactId>kob-client-spring-boot-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>

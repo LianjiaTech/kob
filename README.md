@@ -93,10 +93,10 @@
 
 ### 代码模块简介 
 ```
-1. kob-admin-console 作业管理平台。
-2. kob-admin-core 作业管理底层代码实现模块，以jar包引入方式被kob-admin-console、kob-admin-processor依赖。
-3. kob-admin-processor 作业调度执行器。
-4. kob-basic 服务端（ kob-admin-* ）、客户端（ kob-client-* ）公用jar包。
+1. kob-server-console 作业管理平台。
+2. kob-server-core 作业管理底层代码实现模块，以jar包引入方式被kob-server-console、kob-server-processor依赖。
+3. kob-server-processor 作业调度执行器。
+4. kob-basic 服务端（ kob-server-* ）、客户端（ kob-client-* ）公用jar包。
 5. kob-client-demo-spring-boot 客户端springboot的一种接入形式。
 6. kob-client-parent 作业调度客户端项目依赖jar包。
      kob-client-spring 客户端spring项目依赖jar，会被kob-client-spring-boot-starter依赖。

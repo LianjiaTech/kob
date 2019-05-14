@@ -11,9 +11,35 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <groupId>com.ke</groupId>
-    <artifactId>spring</artifactId>
+    <artifactId>kob-client-spring</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <name>kob-client-spring ${project.version}</name>
 
-    
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.ke</groupId>
+            <artifactId>kob-basic</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+        </dependency>
+    </dependencies>
 </project>
