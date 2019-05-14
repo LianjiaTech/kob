@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -22,6 +24,10 @@ public @NoArgsConstructor class TaskBaseContext implements Comparable<TaskBaseCo
      * 定义ZK data信息
      */
     private @Getter @Setter Data data;
+
+    public String getZkPath() throws UnsupportedEncodingException {
+        return URLEncoder.encode(JSONObject.toJSONString(this.path), "UTF-8");
+    }
 
     /**
      * 排序用于触发

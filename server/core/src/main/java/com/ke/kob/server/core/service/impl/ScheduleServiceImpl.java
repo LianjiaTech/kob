@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -137,17 +138,17 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void pushTask(ZkClient zkClient, TaskWaiting tw, String cluster) {
         TaskBaseContext context = new TaskBaseContext();
-        context.setProjectCode(tw.getProjectCode());
-        context.setJobUuid(tw.getJobUuid());
-        context.setJobCn(tw.getJobCn());
-        context.setTaskUuid(tw.getTaskUuid());
-        context.setTaskKey(tw.getTaskKey());
-        context.setTriggerTime(tw.getTriggerTime());
-        context.setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
-        context.setRecommendNode(tw.getInnerParamsBean().getRecommendNode());
-        context.setTryToExclusionNode(tw.getInnerParamsBean().getTryToExclusionNode());
-        context.setUserParam(JSONObject.parseObject(tw.getUserParams()));
-        String projectTaskPath = ZkPathConstant.clientTaskPath(cluster, context.getProjectCode());
+        context.getData().setProjectCode(tw.getProjectCode());
+        context.getData().setJobUuid(tw.getJobUuid());
+        context.getData().setJobCn(tw.getJobCn());
+        context.getData().setTaskUuid(tw.getTaskUuid());
+        context.getPath().setTaskKey(tw.getTaskKey());
+        context.getPath().setTriggerTime(tw.getTriggerTime());
+        context.getPath().setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
+        context.getPath().setRecommendNode(tw.getInnerParamsBean().getRecommendNode());
+        context.getPath().setTryToExclusionNode(tw.getInnerParamsBean().getTryToExclusionNode());
+        context.getData().setUserParam(JSONObject.parseObject(tw.getUserParams()));
+        String projectTaskPath = ZkPathConstant.clientTaskPath(cluster, context.getData().getProjectCode());
         int state = TaskRecordStateConstant.PUSH_SUCCESS;
         Map<String, Object> param = new HashMap<>(10);
         try {
@@ -254,10 +255,10 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void fireOverstockTask(ZkClient zkClient, List<TaskBaseContext> overstockTask, String cluster) {
+    public void fireOverstockTask(ZkClient zkClient, List<TaskBaseContext> overstockTask, String cluster) throws UnsupportedEncodingException {
         for (TaskBaseContext task : overstockTask) {
-            if (zkClient.delete(task.getPath())) {
-                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, task.getTaskUuid(), cluster);
+            if (zkClient.delete(task.getZkPath())) {
+                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, task.getData().getTaskUuid(), cluster);
             }
         }
     }
@@ -330,17 +331,17 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         TaskRecord retryTask = createRetryTaskRecord(logContext, taskRecord, appendRetryTaskUuid);
         taskRecordMapper.insertOne(retryTask, cluster);
         TaskBaseContext context = new TaskBaseContext();
-        context.setProjectCode(retryTask.getProjectCode());
-        context.setJobUuid(retryTask.getJobUuid());
-        context.setJobCn(retryTask.getJobCn());
-        context.setTaskUuid(retryTask.getTaskUuid());
-        context.setTaskKey(retryTask.getTaskKey());
-        context.setTriggerTime(retryTask.getTriggerTime());
-        context.setDesignatedNode(retryTask.getInnerParamsBean().getDesignatedNode());
-        context.setRecommendNode(retryTask.getInnerParamsBean().getRecommendNode());
-        context.setTryToExclusionNode(retryTask.getInnerParamsBean().getTryToExclusionNode());
-        context.setUserParam(JSONObject.parseObject(retryTask.getUserParams()));
-        String projectTaskPath = ZkPathConstant.clientTaskPath(cluster, context.getProjectCode());
+        context.getData().setProjectCode(retryTask.getProjectCode());
+        context.getData().setJobUuid(retryTask.getJobUuid());
+        context.getData().setJobCn(retryTask.getJobCn());
+        context.getData().setTaskUuid(retryTask.getTaskUuid());
+        context.getPath().setTaskKey(retryTask.getTaskKey());
+        context.getPath().setTriggerTime(retryTask.getTriggerTime());
+        context.getPath().setDesignatedNode(retryTask.getInnerParamsBean().getDesignatedNode());
+        context.getPath().setRecommendNode(retryTask.getInnerParamsBean().getRecommendNode());
+        context.getPath().setTryToExclusionNode(retryTask.getInnerParamsBean().getTryToExclusionNode());
+        context.getData().setUserParam(JSONObject.parseObject(retryTask.getUserParams()));
+        String projectTaskPath = ZkPathConstant.clientTaskPath(cluster, context.getData().getProjectCode());
         int state = TaskRecordStateConstant.PUSH_SUCCESS;
         Map<String, Object> param = new HashMap<>(10);
         try {

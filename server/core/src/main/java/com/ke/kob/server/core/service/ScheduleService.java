@@ -7,6 +7,7 @@ import com.ke.kob.basic.model.LogContext;
 import com.ke.kob.basic.model.TaskBaseContext;
 import org.I0Itec.zkclient.ZkClient;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,7 +78,7 @@ public interface ScheduleService {
      * @param overstockTask 待回收积压任务
      * @param cluster       集群名称
      */
-    void fireOverstockTask(ZkClient zkClient, List<TaskBaseContext> overstockTask, String cluster);
+    void fireOverstockTask(ZkClient zkClient, List<TaskBaseContext> overstockTask, String cluster) throws UnsupportedEncodingException;
 
     /**
      * 查询过期任务数量
