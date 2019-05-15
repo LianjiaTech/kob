@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.ke</groupId>
-    <artifactId>kob-parent</artifactId>
+    <artifactId>schedule-parent</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
@@ -24,7 +24,7 @@
         <mysql.mysql-connector-java>5.1.26</mysql.mysql-connector-java>
         <org.slf4j.slf4j-api>1.6.1</org.slf4j.slf4j-api>
         <com.squareup.okhttp3.okhttp>3.14.1</com.squareup.okhttp3.okhttp>
-        <org.apache.curator.curator-client>4.2.0</org.apache.curator.curator-client>
+        <org.apache.curator.curator-recipes>4.2.0</org.apache.curator.curator-recipes>
     </properties>
     <modules>
         <module>basic</module>
@@ -40,27 +40,22 @@
         <dependencies>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-client-spring</artifactId>
+                <artifactId>schedule-client-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-server-core</artifactId>
+                <artifactId>schedule-server-core</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-basic</artifactId>
+                <artifactId>schedule-basic</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.ke</groupId>
-                <artifactId>kob-client-spring</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.ke</groupId>
-                <artifactId>kob-client-spring-boot-starter</artifactId>
+                <artifactId>schedule-client-spring-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -84,6 +79,11 @@
                         <artifactId>slf4j-log4j12</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${org.apache.curator.curator-recipes}</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>

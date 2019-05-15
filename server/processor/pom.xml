@@ -6,19 +6,19 @@
 
     <parent>
         <groupId>com.ke</groupId>
-        <artifactId>kob-parent</artifactId>
+        <artifactId>schedule-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
     <version>1.0.0-SNAPSHOT</version>
-    <artifactId>kob-server-processor</artifactId>
-    <name>kob-server-processor ${project.version}</name>
+    <artifactId>schedule-server-processor</artifactId>
+    <name>schedule-server-processor ${project.version}</name>
 
     <dependencies>
         <dependency>
             <groupId>com.ke</groupId>
-            <artifactId>kob-server-core</artifactId>
+            <artifactId>schedule-server-core</artifactId>
         </dependency>
     </dependencies>
 </project>

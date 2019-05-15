@@ -6,12 +6,13 @@
 
     <parent>
         <groupId>com.ke</groupId>
-        <artifactId>kob-parent</artifactId>
+        <artifactId>schedule-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kob-basic</artifactId>
     <version>1.0.0-SNAPSHOT</version>
+    <artifactId>schedule-basic</artifactId>
+    <name>schedule-basic ${project.version}</name>
 
     <dependencies>
         <dependency>

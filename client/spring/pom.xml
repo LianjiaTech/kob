@@ -6,14 +6,14 @@
 
     <parent>
         <groupId>com.ke</groupId>
-        <artifactId>kob-parent</artifactId>
+        <artifactId>schedule-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>kob-client-spring</artifactId>
     <version>1.0.0-SNAPSHOT</version>
-    <name>kob-client-spring ${project.version}</name>
+    <artifactId>schedule-client-spring</artifactId>
+    <name>schedule-client-spring ${project.version}</name>
 
     <dependencies>
         <dependency>
@@ -23,7 +23,7 @@
         </dependency>
         <dependency>
             <groupId>com.ke</groupId>
-            <artifactId>kob-basic</artifactId>
+            <artifactId>schedule-basic</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

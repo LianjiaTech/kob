@@ -1,0 +1,9 @@
+{
+  "properties": [
+    {
+      "name": "kob.cluster",
+      "type": "java.lang.String",
+      "description": "Description for kob.cluster."
+    }
+  ]
+}

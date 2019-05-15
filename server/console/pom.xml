@@ -6,13 +6,13 @@
 
     <parent>
         <groupId>com.ke</groupId>
-        <artifactId>kob-parent</artifactId>
+        <artifactId>schedule-parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>kob-server-console</artifactId>
-    <name>kob-server-console ${project.version}</name>
+    <artifactId>schedule-server-console</artifactId>
+    <name>schedule-server-console ${project.version}</name>
 
     <dependencies>
         <dependency>
@@ -21,7 +21,7 @@
         </dependency>
         <dependency>
             <groupId>com.ke</groupId>
-            <artifactId>kob-server-core</artifactId>
+            <artifactId>schedule-server-core</artifactId>
         </dependency>
     </dependencies>
 </project>
