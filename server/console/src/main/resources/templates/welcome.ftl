@@ -79,7 +79,7 @@
                     </div>
                 </div>
             </div>
-            <a href="https://github.com/incubator-kob/kob-parent" target="_blank">
+            <a href="https://github.com/LianjiaTech/kob" target="_blank">
                 <div class="panel-footer">
                     <span class="pull-left">点击 跳转github</span>
                     <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
