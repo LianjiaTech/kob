@@ -6,11 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * @Author: zhaoyuguang
- * @Date: 2018/7/31 上午11:20
- */
-
 public @NoArgsConstructor @Getter @Setter class TaskResult {
 
     private Integer state;

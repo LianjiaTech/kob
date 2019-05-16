@@ -4,13 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-/**
- * 数据库 inner_params 内部参数
- *
- * @Author: zhaoyuguang
- * @Date: 2018/8/20 下午4:31
- */
-
 public @Getter @Setter @NoArgsConstructor class InnerParams {
     /**
      * cron类型作业生成节点

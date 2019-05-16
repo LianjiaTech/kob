@@ -30,14 +30,14 @@ public @Slf4j class CollectServiceImpl implements CollectService {
     private LogCollectMapper logCollectMapper;
     @Resource(name = "scheduleService")
     private ScheduleService scheduleService;
-    @Value("${kob.mysql-prefix}")
-    private String prefix;
+    @Value("${kob-schedule.mysql-prefix}")
+    private String mp;
 
     @Override
     public void handleLogger(LogContext context) {
         String cluster = context.getCluster();
         String taskUuid = context.getTaskUuid();
-        TaskRecord taskRecord = taskRecordMapper.findByTaskUuid(taskUuid, prefix);
+        TaskRecord taskRecord = taskRecordMapper.findByTaskUuid(taskUuid, mp);
         System.out.println("tr =" + JSONObject.toJSONString(taskRecord));
         if (taskRecord == null) {
             log.error("哪来的日志 " + JSONObject.toJSONString(context));

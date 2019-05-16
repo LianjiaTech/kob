@@ -20,8 +20,8 @@ import java.util.List;
 @Service("indexService")
 public class IndexServiceImpl implements IndexService {
 
-    @Value("${kob.mysql-prefix}")
-    private String prefix;
+    @Value("${kob-schedule.mysql-prefix}")
+    private String mp;
     @Resource
     private UserMapper userMapper;
     @Resource
@@ -29,7 +29,7 @@ public class IndexServiceImpl implements IndexService {
 
     @Override
     public User selectUserByCodeAndPwd(String code, String pwd) {
-        return userMapper.selectByCodeAndPwd(code, pwd, prefix);
+        return userMapper.selectByCodeAndPwd(code, pwd, mp);
     }
 
     @Override
@@ -42,22 +42,22 @@ public class IndexServiceImpl implements IndexService {
         projectUser.setConfiguration(configuration);
         projectUser.setProjectMode("service");
         projectUser.setOwner(true);
-        projectUserMapper.insertOne(projectUser, prefix);
+        projectUserMapper.insertOne(projectUser, mp);
     }
 
 
     @Override
     public boolean existProject(String projectCode) {
-        return projectUserMapper.selectCountByProjectCode(projectCode, prefix) != 0;
+        return projectUserMapper.selectCountByProjectCode(projectCode, mp) != 0;
     }
 
     @Override
     public List<ProjectUser> selectProjectUserByUserCode(String code) {
-        return projectUserMapper.selectByUserCode(code, prefix);
+        return projectUserMapper.selectByUserCode(code, mp);
     }
 
     @Override
     public List<ProjectUser> selectProject() {
-        return projectUserMapper.selectProjectIsOwner(prefix);
+        return projectUserMapper.selectProjectIsOwner(mp);
     }
 }

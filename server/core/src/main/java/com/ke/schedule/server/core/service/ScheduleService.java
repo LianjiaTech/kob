@@ -18,17 +18,17 @@ import java.util.Set;
 
 public interface ScheduleService {
 
-    List<TaskWaiting> findTriggerTaskInLimit(long triggerTime, int limit, String cluster);
+    List<TaskWaiting> findTriggerTaskInLimit(long triggerTime, int limit, String mp);
 
-    List<JobCron> findRunningCronJob(String cluster);
+    List<JobCron> findRunningCronJob(String mp);
 
-    void createCronWaitingTaskForTime(String serverIdentification, JobCron jobCron, boolean appendPreviousTask, Integer intervalMin, String cluster, Date now);
+    void createCronWaitingTaskForTime(String serverIdentification, JobCron jobCron, boolean appendPreviousTask, Integer intervalMin, Date now);
 
     void pushTask(TaskWaiting tw, String cluster);
 
     Boolean lockPushTask(TaskWaiting tw, String cluster, String serverIdentification);
 
-    void fireOverstockTask(List<TaskBaseContext> overstockTask, String cluster);
+    void fireOverstockTask(List<TaskBaseContext> overstockTask);
 
     int selectCountExpireTaskRecord(long now, String cluster);
 

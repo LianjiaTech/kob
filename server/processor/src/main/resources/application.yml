@@ -6,19 +6,21 @@ spring:
     name: kob-server-processor
   datasource:
     username: root
-    password: 123456
+    password: admin123
     url: jdbc:mysql://localhost:3306/kob?useUnicode=yes&characterEncoding=UTF8
     driver-class-name: com.mysql.jdbc.Driver
 
 mybatis:
   configuration:
     map-underscore-to-camel-case: true
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 debug: false
 
-kob:
-  cluster: kob
+kob-schedule:
+  zk-connect-string: localhost:2181
+  zk-prefix: kob
+  mysql-prefix: kob
   core:
     zk_servers: localhost:2181
     zk_session_timeout: 10000

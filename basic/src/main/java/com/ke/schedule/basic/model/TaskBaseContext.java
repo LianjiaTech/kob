@@ -8,21 +8,15 @@ import lombok.Setter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-/**
- * @Author: zhaoyuguang
- * @Date: 2018/7/31 上午11:20
- */
+public class TaskBaseContext implements Comparable<TaskBaseContext>{
 
-public @NoArgsConstructor class TaskBaseContext implements Comparable<TaskBaseContext>{
-
-    /**
-     * 定义ZK path信息
-     */
     private @Getter @Setter Path path;
-    /**
-     * 定义ZK data信息
-     */
     private @Getter @Setter Data data;
+
+    public TaskBaseContext() {
+        this.path = new Path();
+        this.data = new Data();
+    }
 
     public String getZkPath() throws UnsupportedEncodingException {
         return URLEncoder.encode(JSONObject.toJSONString(this.path), "UTF-8");

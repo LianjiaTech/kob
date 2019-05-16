@@ -23,12 +23,13 @@ public class NodeServiceImpl implements NodeService {
 
     @Resource
     private CuratorFramework curator;
-    @Value("${kob.cluster}")
-    private String cluster;
+
+    @Value("${kob-schedule.zk-prefix}")
+    private String zp;
 
     @Override
     public List<NodeServer> getNodeServerList() throws Exception {
-        String serverNodePath = ZkPathConstant.serverNodePath(cluster);
+        String serverNodePath = ZkPathConstant.serverNodePath(zp);
         if (curator.checkExists().forPath(serverNodePath)!=null) {
             return new ArrayList<>();
         }
@@ -45,7 +46,7 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public Map<String, ClientInfo> getClientNodes(String projectCode) throws Exception {
-        String clientNodePath = ZkPathConstant.clientNodePath(cluster, projectCode);
+        String clientNodePath = ZkPathConstant.clientNodePath(zp, projectCode);
         if (curator.checkExists().forPath(clientNodePath)!=null) {
             return new HashMap<>(0);
         }
@@ -54,7 +55,7 @@ public class NodeServiceImpl implements NodeService {
         if (!KobUtils.isEmpty(nodeClientStrList)) {
             for (String child : nodeClientStrList) {
                 ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
-                String path = ZkPathConstant.clientNodePath(cluster, projectCode) + ZkPathConstant.BACKSLASH + child;
+                String path = ZkPathConstant.clientNodePath(zp, projectCode) + ZkPathConstant.BACKSLASH + child;
                 String dataStr = new String(curator.getData().forPath(path));
                 if (!KobUtils.isEmpty(dataStr)) {
                     ClientData clientData = JSONObject.parseObject(dataStr, ClientData.class);
@@ -67,7 +68,7 @@ public class NodeServiceImpl implements NodeService {
 
     @Override
     public Map<String, ClientPath> getClientPaths(String projectCode) throws Exception {
-        String clientNodePath = ZkPathConstant.clientNodePath(cluster, projectCode);
+        String clientNodePath = ZkPathConstant.clientNodePath(zp, projectCode);
         if (curator.checkExists().forPath(clientNodePath)!=null) {
             return null;
         }

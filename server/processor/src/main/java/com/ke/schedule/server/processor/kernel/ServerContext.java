@@ -28,8 +28,9 @@ public class ServerContext implements InitializingBean {
 
 //    @Resource(name = "kobProcessorProperties")
     private ProcessorProperties processorProperties;
-    @Value("${kob.cluster}")
-    private String cluster;
+
+    @Value("${kob-schedule.zk-prefix}")
+    private String zp;
 
     private @Getter MasterElector masterElector;
     private @Getter String masterPath;
@@ -38,11 +39,11 @@ public class ServerContext implements InitializingBean {
     private static Date now = new Date();
 
     public String getLocalNodePath() {
-        return ZkPathConstant.serverNodePath(cluster) + ZkPathConstant.BACKSLASH + JSONObject.toJSONString(masterElector.getLocal());
+        return ZkPathConstant.serverNodePath(zp) + ZkPathConstant.BACKSLASH + JSONObject.toJSONString(masterElector.getLocal());
     }
 
-    public String getCluster(){
-        return cluster;
+    public String getZp(){
+        return zp;
     }
 
     public String getLocalNodeIdentification() {
@@ -82,7 +83,7 @@ public class ServerContext implements InitializingBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        this.masterElector = new MasterElector(cluster, now.getTime());
-        this.masterPath = ZkPathConstant.serverNodePath(cluster);
+        this.masterElector = new MasterElector(zp, now.getTime());
+        this.masterPath = ZkPathConstant.serverNodePath(zp);
     }
 }

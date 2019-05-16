@@ -2,6 +2,7 @@ package com.ke.schedule.server.core.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.model.*;
+import com.ke.schedule.server.core.common.AdminConstant;
 import com.ke.schedule.server.core.mapper.JobCronMapper;
 import com.ke.schedule.server.core.mapper.ProjectUserMapper;
 import com.ke.schedule.server.core.mapper.TaskRecordMapper;
@@ -28,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -48,8 +50,10 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     private ProjectUserMapper projectUserMapper;
     @Resource
     private CuratorFramework curator;
-    @Value("${kob.cluster}")
-    private String cluster;
+    @Value("${kob-schedule.zk-prefix}")
+    private String zp;
+    @Value("${kob-schedule.mysql-prefix}")
+    private String mp;
 
     /**
      * 生成通用等待推送任务
@@ -87,18 +91,18 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<TaskWaiting> findTriggerTaskInLimit(long triggerTime, int limit, String cluster) {
-        return taskWaitingMapper.findTriggerTaskInLimit(triggerTime, limit, cluster);
+    public List<TaskWaiting> findTriggerTaskInLimit(long triggerTime, int limit, String mp) {
+        return taskWaitingMapper.findTriggerTaskInLimit(triggerTime, limit, mp);
     }
 
     @Override
-    public List<JobCron> findRunningCronJob(String cluster) {
-        return jobCronMapper.findCronJobBySuspend(false, cluster);
+    public List<JobCron> findRunningCronJob(String mp) {
+        return jobCronMapper.findCronJobBySuspend(false, mp);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void createCronWaitingTaskForTime(String serverIdentification, JobCron jobCron, boolean appendPreviousTask, Integer intervalMin, String cluster, Date now) {
+    public void createCronWaitingTaskForTime(String serverIdentification, JobCron jobCron, boolean appendPreviousTask, Integer intervalMin, Date now) {
         String cronExpression = jobCron.getCronExpression();
         CronExpression cron;
         Long lastGenerateTriggerTime = jobCron.getLastGenerateTriggerTime();
@@ -125,12 +129,12 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         }
         if (!CollectionUtils.isEmpty(cronTaskWaitingList)) {
             int updateCount = jobCronMapper.updateRunningJobCronLastGenerateTriggerTime(jobCron.getJobUuid(),
-                    jobCron.getCronExpression(), lastGenerateTriggerTime, timeAfter.getTime(), cluster);
+                    jobCron.getCronExpression(), lastGenerateTriggerTime, timeAfter.getTime(), mp);
             if (updateCount != 1) {
                 log.error("job_cron data has change uuid:" + jobCron.getJobUuid());
                 throw new RuntimeException("job_cron data has change uuid:" + jobCron.getJobUuid());
             }
-            int insertCount = taskWaitingMapper.insertBatch(cronTaskWaitingList, cluster);
+            int insertCount = taskWaitingMapper.insertBatch(cronTaskWaitingList, mp);
             System.out.println("====" + insertCount + "======");
         }
     }
@@ -152,7 +156,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         int state = TaskRecordStateConstant.PUSH_SUCCESS;
         Map<String, Object> param = new HashMap<>(10);
         try {
-            curator.create().withMode(CreateMode.PERSISTENT).forPath(projectTaskPath + ZkPathConstant.BACKSLASH + JSONObject.toJSONString(context));
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(projectTaskPath + ZkPathConstant.BACKSLASH + JSONObject.toJSONString(context));
         } catch (Exception e) {
             log.error("pushTask_error 推送zk事件异常", e);
             state = TaskRecordStateConstant.PUSH_FAIL;
@@ -163,113 +167,20 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Boolean lockPushTask(TaskWaiting tw, String cluster, String serverIdentification) {
-        Boolean lastTaskComplete = null;
-        String relyUndoTaskUuid = null;
-        if (tw.getRely()) {
-            lastTaskComplete = false;
-            TaskRecord lastTask = taskRecordMapper.selectLastTaskByJobUuid(tw.getJobUuid(), cluster);
-            if (lastTask == null) {
-                lastTaskComplete = true;
-            }
-            if (lastTask != null && lastTask.getComplete()) {
-                lastTaskComplete = true;
-            }
-            if (lastTask != null && !lastTask.getComplete()) {
-                relyUndoTaskUuid = lastTask.getTaskUuid();
-            }
-        }
-        TaskRecord taskRecord = createCommonTaskRecord(tw, serverIdentification, lastTaskComplete, relyUndoTaskUuid);
-        int deleteCount = taskWaitingMapper.deleteOne(tw.getTaskUuid(), cluster);
-        if (deleteCount != 1) {
-            log.error("server_admin_code_error_100:删除等待任务数量不为1");
-            throw new RuntimeException("server_code_error_100:删除等待任务数量不为1");
-        }
-        int insertCount = taskRecordMapper.insertOne(taskRecord, cluster);
-        if (insertCount != 1) {
-            log.error("server_admin_code_error_101:插入任务记录数量不为1");
-            throw new RuntimeException("server_code_error_101:插入任务记录数量不为1");
-        }
-        return lastTaskComplete;
-    }
-
-    /**
-     * 生成通用任务记录
-     *
-     * @param tw                   等待推送任务
-     * @param serverIdentification server节点唯一标识
-     * @param lastTaskComplete     上一次作业是否完成
-     * @param relyUndoTaskUuid     是否依赖上周期的uuid
-     * @return 任务记录
-     */
-    private TaskRecord createCommonTaskRecord(TaskWaiting tw, String serverIdentification, Boolean lastTaskComplete,
-                                              String relyUndoTaskUuid) {
-        TaskRecord tr = new TaskRecord();
-        tr.setProjectCode(tw.getProjectCode());
-        tr.setProjectName(tw.getProjectName());
-        tr.setJobUuid(tw.getJobUuid());
-        tr.setJobType(tw.getJobType());
-        tr.setJobCn(tw.getJobCn());
-        tr.setTaskKey(tw.getTaskKey());
-        tr.setTaskRemark(tw.getTaskRemark());
-        tr.setTaskType(TaskType.NONE.name());
-        tr.setTaskUuid(tw.getTaskUuid());
-        tr.setRelationTaskUuid(tw.getTaskUuid());
-        tr.setLoadBalance(tw.getLoadBalance());
-        tr.setRetryType(tw.getRetryType());
-        tr.setBatchType(tw.getBatchType());
-        tr.setRely(tw.getRely());
-        tr.setAncestor(true);
-        tr.setUserParams(tw.getUserParams());
-        tr.setClientIdentification("");
-        InnerParams innerParams = KobUtils.isEmpty(tw.getInnerParams()) ? new InnerParams() : JSONObject.parseObject(tw.getInnerParams(), InnerParams.class);
-        innerParams.setTaskPushNode(serverIdentification);
-        if (LoadBalanceType.NODE_HASH.name().equals(tw.getLoadBalance())) {
-            List<String> clientNodePathList = null;
-            try {
-                clientNodePathList = curator.getChildren().forPath(ZkPathConstant.clientNodePath(cluster, tw.getProjectCode()));
-            } catch (Exception e) {
-                //todo
-                log.error("e", e);
-            }
-            List<String> nodeList = new ArrayList<>();
-            if (!KobUtils.isEmpty(clientNodePathList)) {
-                for (String child : clientNodePathList) {
-                    ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
-                    nodeList.add(clientPath.getIdentification());
-                }
-            }
-            innerParams.setRecommendNode(NodeHashLoadBalance.doSelect(nodeList, tw.getJobUuid()));
-            innerParams.setRelyUndoTaskUuid(relyUndoTaskUuid);
-        }
-
-        tr.setCronExpression(tw.getCronExpression());
-        tr.setTimeoutThreshold(tw.getTimeoutThreshold());
-        if (tw.getRely()) {
-            tr.setState(lastTaskComplete ? TaskRecordStateConstant.WAITING_PUSH : TaskRecordStateConstant.RELY_UNDO);
-            tr.setComplete(!lastTaskComplete);
-            innerParams.setRelyUndoTaskUuid(relyUndoTaskUuid);
-        } else {
-            tr.setState(TaskRecordStateConstant.WAITING_PUSH);
-            tr.setComplete(false);
-        }
-        tr.setInnerParams(JSONObject.toJSONString(innerParams));
-        tr.setRetryCount(tw.getRetryCount());
-        tr.setTriggerTime(tw.getTriggerTime());
-        return tr;
+        return null;
     }
 
     @Override
-    public void fireOverstockTask(List<TaskBaseContext> overstockTask, String cluster) {
-        for (TaskBaseContext task : overstockTask) {
+    public void fireOverstockTask(List<TaskBaseContext> overstockTask) {
+        overstockTask.forEach(t ->{
             try {
-                curator.delete().forPath(task.getZkPath());
-                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, task.getData().getTaskUuid(), cluster);
+                curator.delete().forPath(t.getZkPath());
+                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, t.getData().getTaskUuid(), zp);
             }catch (Exception e){
                 log.error("er",e);
             }
-        }
+        });
     }
 
     @Override
@@ -322,7 +233,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
             param.put("msg", context.getMsg());
         }
         if (!param.isEmpty()) {
-            taskRecordMapper.updateByTaskUuid(param, context.getTaskUuid(), cluster);
+            taskRecordMapper.updateByTaskUuid(param, context.getTaskUuid(), mp);
         }
         if (needAppendRetry) {
             handleRetryFailTask(context, taskRecord, appendRetryTaskUuid);
@@ -338,7 +249,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
      */
     private void handleRetryFailTask(LogContext logContext, TaskRecord taskRecord, String appendRetryTaskUuid) {
         TaskRecord retryTask = createRetryTaskRecord(logContext, taskRecord, appendRetryTaskUuid);
-        taskRecordMapper.insertOne(retryTask, cluster);
+        taskRecordMapper.insertOne(retryTask, mp);
         TaskBaseContext context = new TaskBaseContext();
         context.getData().setProjectCode(retryTask.getProjectCode());
         context.getData().setJobUuid(retryTask.getJobUuid());
@@ -350,7 +261,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         context.getPath().setRecommendNode(retryTask.getInnerParamsBean().getRecommendNode());
         context.getPath().setTryToExclusionNode(retryTask.getInnerParamsBean().getTryToExclusionNode());
         context.getData().setUserParam(JSONObject.parseObject(retryTask.getUserParams()));
-        String projectTaskPath = ZkPathConstant.clientTaskPath(cluster, context.getData().getProjectCode());
+        String projectTaskPath = ZkPathConstant.clientTaskPath(mp, context.getData().getProjectCode());
         int state = TaskRecordStateConstant.PUSH_SUCCESS;
         Map<String, Object> param = new HashMap<>(10);
         try {
@@ -361,7 +272,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
             param.put("complete", true);
         }
         param.put("state", state);
-        taskRecordMapper.updateByTaskUuid(param, appendRetryTaskUuid, cluster);
+        taskRecordMapper.updateByTaskUuid(param, appendRetryTaskUuid, mp);
     }
 
     /**
@@ -404,61 +315,61 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public int selectCronJobCountByProjectCode(String projectCode) {
-        return jobCronMapper.selectCountByProjectCode(projectCode, cluster);
+        return jobCronMapper.selectCountByProjectCode(projectCode, mp);
     }
 
     @Override
     public List<JobCron> selectJobCronPageByProject(String projectCode, Integer start, Integer limit) {
-        return jobCronMapper.selectPageJobCronByProject(projectCode, start, limit, cluster);
+        return jobCronMapper.selectPageJobCronByProject(projectCode, start, limit, mp);
     }
 
     @Override
     public int selectTaskWaitingCountByProjectCode(String projectCode) {
-        return taskWaitingMapper.selectCountByProjectCode(projectCode, cluster);
+        return taskWaitingMapper.selectCountByProjectCode(projectCode, mp);
     }
 
     @Override
     public List<TaskWaiting> selectTaskWaitingPageByProject(String projectCode, Integer start, Integer limit) {
-        return taskWaitingMapper.selectPageByProjectCode(projectCode, start, limit, cluster);
+        return taskWaitingMapper.selectPageByProjectCode(projectCode, start, limit, mp);
     }
 
     @Override
     public void saveJobRealTime(TaskWaiting taskWaiting) {
-        taskWaitingMapper.insertOne(taskWaiting, cluster);
+        taskWaitingMapper.insertOne(taskWaiting, mp);
     }
 
     @Override
     public int startJobCron(String jobUuid, Boolean suspend, String projectCode) {
-        return jobCronMapper.updateSuspend(!suspend, jobUuid, projectCode, suspend, cluster);
+        return jobCronMapper.updateSuspend(!suspend, jobUuid, projectCode, suspend, mp);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void suspendJobCron(String jobUuid, Boolean suspend, String projectCode) {
-        jobCronMapper.updateSuspend(!suspend, jobUuid, projectCode, suspend, cluster);
-        taskWaitingMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, cluster);
+        jobCronMapper.updateSuspend(!suspend, jobUuid, projectCode, suspend, mp);
+        taskWaitingMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, mp);
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void delJobCron(String jobUuid, String projectCode) {
-        jobCronMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, cluster);
-        taskWaitingMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, cluster);
+        jobCronMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, mp);
+        taskWaitingMapper.deleteByJobUuidAndProjectCode(jobUuid, projectCode, mp);
     }
 
     @Override
     public int triggerTaskWaiting(String taskUuid, String projectCode) {
-        return taskWaitingMapper.triggerTaskWaiting(System.currentTimeMillis(), taskUuid, projectCode, cluster);
+        return taskWaitingMapper.triggerTaskWaiting(System.currentTimeMillis(), taskUuid, projectCode, mp);
     }
 
     @Override
     public int delTaskWaiting(String taskUuid, String projectCode) {
-        return taskWaitingMapper.deleteByTaskUuidAndProjectCode(taskUuid, projectCode, cluster);
+        return taskWaitingMapper.deleteByTaskUuidAndProjectCode(taskUuid, projectCode, mp);
     }
 
     @Override
     public int saveJobCron(JobCron jobCron) {
-        return jobCronMapper.insertOne(jobCron, cluster);
+        return jobCronMapper.insertOne(jobCron, mp);
     }
 
     @Override
@@ -469,13 +380,13 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
                 editJobCron.getUserParams(),
                 editJobCron.getJobUuid(),
                 editJobCron.getProjectCode(),
-                cluster);
-        taskWaitingMapper.deleteByJobUuidAndProjectCode(editJobCron.getJobUuid(), editJobCron.getProjectCode(), cluster);
+                mp);
+        taskWaitingMapper.deleteByJobUuidAndProjectCode(editJobCron.getJobUuid(), editJobCron.getProjectCode(), mp);
     }
 
     @Override
     public Set<String> selectServiceProjectCodeSet() {
-        List<ProjectUser> projectList = projectUserMapper.selectProjectIsOwner(cluster);
+        List<ProjectUser> projectList = projectUserMapper.selectProjectIsOwner(mp);
         Set<String> serviceProjectCodeSet = new HashSet<>();
         if (!KobUtils.isEmpty(projectList)) {
             for (ProjectUser projectUser : projectList) {

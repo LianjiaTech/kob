@@ -12,7 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @Date: 2018/9/12 下午4:40
  */
 
-@SpringBootApplication(scanBasePackages = {"com.ke.kob"})
+@SpringBootApplication(scanBasePackages = {"com.ke"})
 @MapperScan("com.ke.schedule.server.core.mapper")
 public class BootProcessor implements CommandLineRunner {
 

@@ -1,10 +1,5 @@
 package com.ke.schedule.basic.constant;
 
-/**
- * @Author: zhaoyuguang
- * @Date: 2018/7/31 上午11:28
- */
-
 public class TaskRecordStateConstant {
 
     /**

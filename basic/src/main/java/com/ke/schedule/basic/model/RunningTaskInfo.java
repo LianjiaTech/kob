@@ -1,10 +1,5 @@
 package com.ke.schedule.basic.model;
 
-/**
- * @Author: zhaoyuguang
- * @Date: 2018/8/22 上午11:52
- */
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;

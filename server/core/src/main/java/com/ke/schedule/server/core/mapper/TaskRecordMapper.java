@@ -25,13 +25,6 @@ public interface TaskRecordMapper {
 
     String TABLE = " ${prefix}_task_record ";
 
-    /**
-     * 插入任务记录表
-     *
-     * @param taskRecord 任务记录对象
-     * @param prefix    集群
-     * @return 影响行数
-     */
     @Insert("insert into " + TABLE +
             "(project_code, project_name, job_uuid, job_type, job_cn, task_key," +
             "task_remark, task_type, task_uuid, relation_task_uuid, load_balance, " +
@@ -46,52 +39,21 @@ public interface TaskRecordMapper {
             "#{tr.retryCount}, #{tr.batchType}, #{tr.clientIdentification}, #{tr.triggerTime}) ")
     int insertOne(@Param("tr") TaskRecord taskRecord, @Param("prefix") String prefix);
 
-    /**
-     * 根据taskUuid 更新任务状态
-     *
-     * @param state    记录状态
-     * @param taskUuid 任务唯一标识
-     * @param prefix  集群
-     * @return 影响行数
-     */
     @Update("update " + TABLE +
             "set state = #{state}, complete = 1 " +
             "where task_uuid = #{taskUuid} ")
     int updateStateByTaskUuid(@Param("state") int state, @Param("taskUuid") String taskUuid, @Param("prefix") String prefix);
 
-    /**
-     * 根据任务唯一标识和集群，查询单条数据
-     *
-     * @param taskUuid 唯一标识
-     * @param prefix  集群
-     * @return 任务记录
-     */
     @Select("select " + COLUMN +
             "from " + TABLE +
             "where task_uuid = #{taskUuid} ")
     TaskRecord findByTaskUuid(@Param("taskUuid") String taskUuid, @Param("prefix") String prefix);
 
-    /**
-     * 查询过期记录
-     *
-     * @param now     System.currentTimeMillis()
-     * @param prefix 集群
-     * @return 任务记录列表
-     */
     @Select("select count(1) " +
             "from " + TABLE +
             "where complete = 0 and trigger_time+timeout_threshold*1000 < #{now} ")
     int selectCountExpireTaskRecord(@Param("now") long now, @Param("prefix") String prefix);
 
-    /**
-     * 查询过期记录
-     *
-     * @param now     System.currentTimeMillis()
-     * @param start   起始行数
-     * @param limit   数量
-     * @param prefix 集群
-     * @return 任务记录列表
-     */
     @Select("select " + COLUMN +
             "from " + TABLE +
             "where complete = 0 and trigger_time+timeout_threshold*1000 < #{now} " +
@@ -99,14 +61,6 @@ public interface TaskRecordMapper {
             "limit ${start}, ${limit} ")
     List<TaskRecord> selectListExpireTaskRecord(@Param("now") long now, @Param("start") int start, @Param("limit") int limit, @Param("prefix") String prefix);
 
-
-    /**
-     * 更新完成状态和记录状态根据taskUuid
-     *
-     * @param param    参数
-     * @param taskUuid 任务唯一标识
-     * @param prefix  集群
-     */
     @Update("<script>" +
             "   update " + TABLE +
             "   <set> " +
@@ -123,13 +77,6 @@ public interface TaskRecordMapper {
             "</script>")
     void updateByTaskUuid(@Param("param") Map<String, Object> param, @Param("taskUuid") String taskUuid, @Param("prefix") String prefix);
 
-    /**
-     * 任务记录数量
-     *
-     * @param param   查询参数
-     * @param prefix 集群
-     * @return 任务记录列表
-     */
     @Select("<script>" +
             "   select count(1) " +
             "   from " + TABLE +
@@ -141,15 +88,6 @@ public interface TaskRecordMapper {
             "</script>")
     int selectCountByParam(@Param("param") Map<String, Object> param, @Param("prefix") String prefix);
 
-    /**
-     * 分页查询任务记录
-     *
-     * @param param   查询参数
-     * @param start   起始行数
-     * @param limit   数量
-     * @param prefix 集群
-     * @return 返回查询数量行数
-     */
     @Select("<script>" +
             "   select " + COLUMN +
             "   from " + TABLE +
@@ -165,17 +103,10 @@ public interface TaskRecordMapper {
                                        @Param("limit") Integer limit,
                                        @Param("prefix") String prefix);
 
-    /**
-     * 根据作业JobUuid查询最后最后执行任务用于作业是否依赖上一周期场景
-     *
-     * @param jobUuid 作业标识
-     * @param prefix 集群
-     * @return 任务记录
-     */
     @Select("select " + COLUMN +
             "from " + TABLE +
             "where  job_uuid = #{jobUuid} and ancestor = 1 and state != '" + TaskRecordStateConstant.RELY_UNDO + "' " +
             "order by id desc " +
             "limit 1")
-    TaskRecord selectLastTaskByJobUuid(@Param("jobUuid") String jobUuid, @Param("prefix") String prefix);
+    TaskRecord selectLastUndoTaskByJobUuid(@Param("jobUuid") String jobUuid, @Param("prefix") String prefix);
 }

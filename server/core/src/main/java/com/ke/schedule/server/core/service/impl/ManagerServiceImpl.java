@@ -24,31 +24,31 @@ public class ManagerServiceImpl implements ManagerService {
     private ProjectUserMapper projectUserMapper;
     @Resource
     private UserMapper userMapper;
-    @Value("${kob.mysql-prefix}")
-    private String prefix;
+    @Value("${kob-schedule.mysql-prefix}")
+    private String mp;
 
     @Override
     public int selectProjectUserCountByProjectCode(String projectCode) {
-        return projectUserMapper.selectCountByProjectCode(projectCode, prefix);
+        return projectUserMapper.selectCountByProjectCode(projectCode, mp);
     }
 
     @Override
     public List<ProjectUser> selectProjectUserPageByProjectCode(String userCode, String projectCode, Integer start, Integer limit) {
-        return projectUserMapper.selectPageByProjectCode(projectCode, start, limit, prefix);
+        return projectUserMapper.selectPageByProjectCode(projectCode, start, limit, mp);
     }
 
     @Override
     public User selectUserByUserCode(String userCode) {
-        return userMapper.selectOneByCode(userCode, prefix);
+        return userMapper.selectOneByCode(userCode, mp);
     }
 
     @Override
     public int insertProjectUser(ProjectUser projectUser) {
-        return projectUserMapper.insertOne(projectUser, prefix);
+        return projectUserMapper.insertOne(projectUser, mp);
     }
 
     @Override
     public int deleteProjectUser(String projectCode, String id) {
-        return projectUserMapper.delete(projectCode, id, prefix);
+        return projectUserMapper.delete(projectCode, id, mp);
     }
 }
