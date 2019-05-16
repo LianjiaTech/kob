@@ -30,14 +30,15 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public List<NodeServer> getNodeServerList() throws Exception {
         String serverNodePath = ZkPathConstant.serverNodePath(zp);
-        if (curator.checkExists().forPath(serverNodePath)!=null) {
+        if (curator.checkExists().forPath(serverNodePath)==null) {
             return new ArrayList<>();
         }
         List<String> nodeServerStrList = curator.getChildren().forPath(serverNodePath);
         List<NodeServer> nodeServerList = new ArrayList<>();
         if (!KobUtils.isEmpty(nodeServerStrList)) {
             for (String nodeServerStr : nodeServerStrList) {
-                NodeServer nodeServer = JSONObject.parseObject(nodeServerStr, NodeServer.class);
+                byte[] b = curator.getData().forPath(ZkPathConstant.serverNodePath(zp)+ZkPathConstant.BACKSLASH+nodeServerStr);
+                NodeServer nodeServer = JSONObject.parseObject(new String(b), NodeServer.class);
                 nodeServerList.add(nodeServer);
             }
         }

@@ -15,10 +15,13 @@ public class Kernel implements InitializingBean {
     private CornTask cornTask;
     @Resource
     private WaitingTask waitingTask;
+    @Resource
+    private Heartbeat heartbeat;
 
     @Override
     public void afterPropertiesSet() {
         cornTask.initialize();
         waitingTask.initialize();
+        heartbeat.initialize();
     }
 }
