@@ -130,12 +130,12 @@
                     <p>
                         <i class="fa fa-check-circle-o"></i> 生产环境：<a href="http://localhost:8669" target="_blank"> online_url</a><br/>
                         <ul>
-                            <li>集群名称：incubator</li>
+                            <li>集群名称：kob</li>
                             <li>zk地址：online_url:2801</li>
                         </ul>
                         <i class="fa fa-ban"></i> 线下环境：<a href="" target="_blank"> offline_url</a><br/>
                         <ul>
-                            <li>集群名称：incubator</li>
+                            <li>集群名称：kob</li>
                             <li>zk地址：offline_url:2801</li>
                         </ul>
                     </p>
@@ -151,10 +151,10 @@
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h5 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#version" href="#version_0_1_0_M0">0.1.0-M0</a>
+                                <a data-toggle="collapse" data-parent="#version" href="#version_1_0_0_M0">1.0.0-M0</a>
                             </h5>
                         </div>
-                        <div id="version_0_1_0_M0" class="panel-collapse collapse in">
+                        <div id="version_1_0_0_M0" class="panel-collapse collapse in">
                             <div class="panel-body">
                                 <div class="alert alert-warning">此版本是初始化版本。</div>
                                 <ol>

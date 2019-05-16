@@ -76,14 +76,14 @@ class ManagerController {
         if (KobUtils.isEmpty(projectName) || projectName.length() > 60) {
             return ResponseData.error("项目名称有误");
         }
-        boolean zkExist = curator.checkExists().forPath(ZkPathConstant.clientNodePath(zp, projectCode)) == null;
+        boolean zkExist = curator.checkExists().forPath(ZkPathConstant.clientNodePath(zp, projectCode)) != null;
         boolean dbExist = indexService.existProject(projectCode);
         if (zkExist || dbExist) {
             return ResponseData.error("项目已存在");
         }
         indexService.initProject(user.getCode(), user.getName(), user.getConfiguration(), projectCode, projectName);
-        curator.create().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientNodePath(zp, projectCode));
-        curator.create().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientNodePath(zp, projectCode));
+        curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
+        curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientNodePath(zp, projectCode));
         return ResponseData.success();
     }
 
