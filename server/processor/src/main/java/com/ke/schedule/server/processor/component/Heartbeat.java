@@ -51,10 +51,11 @@ public @Slf4j class Heartbeat {
     }
 
     private void heartbeat() {
+        String path = ZkPathConstant.serverNodePath(zp)+ZkPathConstant.BACKSLASH+"id:xxx";
         try {
-            if(curator.checkExists().forPath(ZkPathConstant.serverNodePath(zp))==null){
+            if(curator.checkExists().forPath(path)==null){
                 NodeServer local = new NodeServer(zp, IpUtils.getLocalAddress(), UuidUtils.builder(UuidUtils.AbbrType.SN), System.currentTimeMillis());
-                curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(ZkPathConstant.serverNodePath(zp)+ZkPathConstant.BACKSLASH+"id:xxx", JSONObject.toJSONString(local).getBytes());
+                curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(local).getBytes());
             }
         } catch (Exception e) {
             log.error("心跳 error", e);

@@ -13,8 +13,15 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group input-group">
-                                    <span class="input-group-addon">集群名称</span>
-                                    <input class="form-control" value="incubator" disabled>
+                                    <span class="input-group-addon">zk前缀</span>
+                                    <input class="form-control" value="kob" disabled>
+                                </div>
+                            </div>
+                            <div class="col-lg-1"></div>
+                            <div class="col-lg-3">
+                                <div class="form-group input-group">
+                                    <span class="input-group-addon">mysql前缀</span>
+                                    <input class="form-control" value="kob" disabled>
                                 </div>
                             </div>
                             <div class="col-lg-1"></div>

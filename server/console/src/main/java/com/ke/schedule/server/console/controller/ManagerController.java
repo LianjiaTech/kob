@@ -82,8 +82,16 @@ class ManagerController {
             return ResponseData.error("项目已存在");
         }
         indexService.initProject(user.getCode(), user.getName(), user.getConfiguration(), projectCode, projectName);
-        curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
-        curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientNodePath(zp, projectCode));
+        try {
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(ZkPathConstant.clientNodePath(zp, projectCode));
+        } catch (Exception e){
+            e.printStackTrace();
+        }
         return ResponseData.success();
     }
 
