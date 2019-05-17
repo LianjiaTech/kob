@@ -6,6 +6,8 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -15,31 +17,20 @@ import java.util.concurrent.TimeUnit;
  */
 public @Slf4j class OkHttpUtils {
 
-    private static final OkHttpClient OK_HTTP_CLIENT = new OkHttpClient.Builder().connectTimeout(6, TimeUnit.SECONDS)
-            .readTimeout(6, TimeUnit.SECONDS).writeTimeout(6, TimeUnit.SECONDS).build();
+    private static final OkHttpClient okHttpClient;
 
-    public static Response get(String url) {
-        return execute(url, null);
+    public static Response post(String url, RequestBody body) {
+        Request request = (new Request.Builder()).url(url).post(body).build();
+
+        try {
+            return okHttpClient.newCall(request).execute();
+        } catch (IOException var4) {
+            log.error("Http Post请求失败,url:" + url + ", body:" + JSONObject.toJSONString(body), var4);
+            return null;
+        }
     }
 
-    public static Response execute(String url, RequestBody body) {
-        Request.Builder builder = new Request.Builder()
-                .url(url);
-        if (builder != null) {
-            builder.get();
-        }
-        Request request = builder.build();
-        Response response = null;
-        try {
-            response = OK_HTTP_CLIENT.newCall(request).execute();
-            return response;
-        } catch (IOException e) {
-            log.error("Http Post请求失败,url:" + url + ", body:" + JSONObject.toJSONString(body), e);
-            return null;
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-        }
+    static {
+        okHttpClient = (new okhttp3.OkHttpClient.Builder()).connectTimeout(6L, TimeUnit.SECONDS).readTimeout(6L, TimeUnit.SECONDS).writeTimeout(6L, TimeUnit.SECONDS).build();
     }
 }

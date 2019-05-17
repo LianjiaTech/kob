@@ -11,12 +11,6 @@ import org.springframework.core.annotation.Order;
 
 import java.util.Map;
 
-/**
- * KOB作业调度 springboot自动装配类
- *
- * @Author: zhaoyuguang
- * @Date: 2018/7/31 下午2:45
- */
 @Configuration
 public class KobClientAutoConfiguration extends AbstractAutoConfiguration {
 

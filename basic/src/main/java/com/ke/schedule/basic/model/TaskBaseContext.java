@@ -47,6 +47,10 @@ public class TaskBaseContext implements Comparable<TaskBaseContext>{
          */
         private @Getter @Setter String taskKey;
         /**
+         * 任务唯一标识
+         */
+        private @Getter @Setter String taskUuid;
+        /**
          * 触发时间
          */
         private @Getter @Setter Long triggerTime;
@@ -88,10 +92,6 @@ public class TaskBaseContext implements Comparable<TaskBaseContext>{
          * 作业名称
          */
         private @Getter @Setter String jobCn;
-        /**
-         * 任务唯一标识
-         */
-        private @Getter @Setter String taskUuid;
         /**
          * 用户自定义参数可以用于分片或一些其他场景
          */

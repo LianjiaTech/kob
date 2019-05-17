@@ -5,6 +5,7 @@ import com.ke.schedule.basic.model.TaskBaseContext;
 import com.ke.schedule.basic.model.TaskResult;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 /**
  * @Author: zhaoyuguang
@@ -13,35 +14,22 @@ import java.lang.reflect.Method;
 
 public class TaskRunnerBuilder {
 
-    public static TaskRunner build(final Object targetObject, final Method targetMethod, final Class<?>[] pTypes) {
-        return new TaskRunner() {
-            @Override
-            public TaskResult run(TaskBaseContext context) throws Exception {
-                if (pTypes == null || pTypes.length == 0) {
-                    return invoke(targetObject, targetMethod);
+    public static Function<TaskBaseContext, TaskResult> build(final Object targetObject, final Method method) {
+        return context -> {
+            final Class<?>[] types = method.getParameterTypes();
+            Object[] parameters = new Object[method.getTypeParameters().length];
+            for (int i = 0; i < method.getTypeParameters().length; i++) {
+                if (types[i] == TaskBaseContext.class) {
+                    parameters[i] = context;
                 }
-
-                Object[] pTypeValues = new Object[pTypes.length];
-                for (int i = 0; i < pTypes.length; i++) {
-                    if (pTypes[i] == TaskBaseContext.class) {
-                        pTypeValues[i] = context;
-                    } else {
-                        pTypeValues[i] = null;
-                    }
-                }
-                return invoke(targetObject, targetMethod, pTypeValues);
             }
+            try {
+                return invoke(targetObject, method, parameters);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
         };
-    }
-
-    private static TaskResult invoke(Object targetObject, Method targetMethod) throws Exception {
-        Class<?> returnType = targetMethod.getReturnType();
-        if (returnType != TaskResult.class) {
-            targetMethod.invoke(targetObject);
-            return new TaskResult(TaskRecordStateConstant.EXECUTE_SUCCESS);
-        } else {
-            return (TaskResult) targetMethod.invoke(targetObject);
-        }
     }
 
     private static TaskResult invoke(Object targetObject, Method targetMethod, Object[] pTypeValues) throws Exception {

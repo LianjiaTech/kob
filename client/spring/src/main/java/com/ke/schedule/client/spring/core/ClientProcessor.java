@@ -21,7 +21,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @Date: 2018/7/31 下午3:57
  */
 
-public @NoArgsConstructor @Slf4j class ClientProcessor {
+public @NoArgsConstructor
+@Slf4j
+class ClientProcessor {
     private static final ScheduledExecutorService CLIENT_HEARTBEAT = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("kob-client-heartbeat", true));
     private static final AtomicBoolean POWER = new AtomicBoolean(false);
     private static final AtomicBoolean CHECK_STEP = new AtomicBoolean(false);
@@ -29,10 +31,16 @@ public @NoArgsConstructor @Slf4j class ClientProcessor {
     private ClientContext clientContext;
 
     public ClientProcessor(ClientProperties prop, Map<String, Object> beans) {
-        clientContext = new ClientContext(prop, beans);
+        clientContext = new ClientContext.Builder()
+                .zk(prop.getZkConnectString(), prop.getZkConnectionTimeout(), prop.getZkSessionTimeout(), prop.getZkAuthInfo())
+                .runner(beans)
+                .pool(prop.getThreads())
+                .build();
     }
 
     public void init() {
+
+
         if (!clientContext.checkProperties()) {
             return;
         }
@@ -97,7 +105,7 @@ public @NoArgsConstructor @Slf4j class ClientProcessor {
                     zkClient.subscribeChildChanges(clientContext.getClientTaskPath(), new IZkChildListener() {
                         @Override
                         public void handleChildChange(String parentPath, List<String> currentChilds) throws Exception {
-                            clientContext.getDispatcher().dispatcher(parentPath, currentChilds);
+                            TaskDispatcher.INSTANCE.dispatcher(clientContext, parentPath, currentChilds);
                         }
                     });
                     WATCHER_STEP.set(true);

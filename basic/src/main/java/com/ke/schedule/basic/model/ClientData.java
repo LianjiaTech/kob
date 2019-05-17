@@ -14,6 +14,7 @@ public @NoArgsConstructor @Getter @Setter class ClientData implements Serializab
     private static final long serialVersionUID = 1741453540074964061L;
 
     private String version;
+    private String token;
     private String ip;
     private String identification;
     private String projectCode;

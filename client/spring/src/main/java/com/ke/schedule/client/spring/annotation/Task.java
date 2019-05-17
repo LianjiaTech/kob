@@ -14,7 +14,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Task {
-    String key();//任务标识
+    String key();
 
-    String remark();//任务备注
+    String cn();
 }
