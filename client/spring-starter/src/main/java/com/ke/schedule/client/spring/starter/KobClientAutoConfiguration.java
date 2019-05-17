@@ -21,7 +21,7 @@ import java.util.Map;
 public class KobClientAutoConfiguration extends AbstractAutoConfiguration {
 
     @Bean(name = "kobClientProperties")
-    @ConfigurationProperties(prefix = "kob.client")
+    @ConfigurationProperties(prefix = "kob-schedule-client")
     public ClientProperties prop() {
         return new ClientProperties();
     }
@@ -30,8 +30,6 @@ public class KobClientAutoConfiguration extends AbstractAutoConfiguration {
     @Bean(name = "kobScheduleProcessor", initMethod = "init", destroyMethod = "destroy")
     public ClientProcessor scheduleProcessor() {
         ClientProperties prop = (ClientProperties) applicationContext.getBean("kobClientProperties");
-        prop.build();
-        Map<String, Object> beans = applicationContext.getBeansWithAnnotation(Kob.class);
-        return new ClientProcessor(prop, beans);
+        return new ClientProcessor(prop.build(), applicationContext.getBeansWithAnnotation(Kob.class));
     }
 }

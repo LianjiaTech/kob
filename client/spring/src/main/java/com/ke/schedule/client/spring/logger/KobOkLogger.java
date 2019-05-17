@@ -40,7 +40,7 @@ public @Slf4j class KobOkLogger implements KobLogger {
         this.projectCode = taskContext.getData().getProjectCode();
         this.taskUuid = taskContext.getData().getTaskUuid();
         this.clientIdentification = clientContext.getClient().getIdentification();
-        this.cluster = clientContext.getProp().getCluster();
+        this.cluster = clientContext.getProp().getZkPrefix();
     }
 
     @Override

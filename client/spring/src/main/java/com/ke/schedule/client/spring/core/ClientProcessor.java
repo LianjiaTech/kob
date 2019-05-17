@@ -44,7 +44,7 @@ public @NoArgsConstructor @Slf4j class ClientProcessor {
         heartbeat();
         log.info(ClientLogConstant.info101(clientContext.getClient().getProjectCode(),
                 clientContext.getClient().getIp(),
-                clientContext.getProp().getZkServers(),
+                clientContext.getProp().getZkConnectString(),
                 clientContext.getAdminUrl(),
                 clientContext.getClient().getTasks()));
     }

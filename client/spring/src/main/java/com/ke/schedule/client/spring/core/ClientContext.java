@@ -67,7 +67,7 @@ public @Slf4j class ClientContext {
             log.error(ClientLogConstant.error500("spring配置文件中未找到kob.client属性"));
             return false;
         }
-        if (KobUtils.isEmpty(prop.getCluster())) {
+        if (KobUtils.isEmpty(prop.getZkPrefix())) {
             log.error(ClientLogConstant.error500("spring配置文件中未找到kob.client.cluster属性"));
             return false;
         }
@@ -75,7 +75,7 @@ public @Slf4j class ClientContext {
             log.error(ClientLogConstant.error500("spring配置文件中未找到kob.client.project_code属性"));
             return false;
         }
-        if (KobUtils.isEmpty(prop.getZkServers())) {
+        if (KobUtils.isEmpty(prop.getZkConnectString())) {
             log.error(ClientLogConstant.error500("spring配置文件中未找到kob.client.zk_servers属性"));
             return false;
         }
@@ -123,8 +123,8 @@ public @Slf4j class ClientContext {
         }
         OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
         okHttpClient = okHttpClientBuilder.build();
-        clientTaskPath = ZkPathConstant.clientTaskPath(prop.getCluster(), prop.getProjectCode());
-        clientNodePath = ZkPathConstant.clientNodePath(prop.getCluster(), prop.getProjectCode());
+        clientTaskPath = ZkPathConstant.clientTaskPath(prop.getZkPrefix(), prop.getProjectCode());
+        clientNodePath = ZkPathConstant.clientNodePath(prop.getZkPrefix(), prop.getProjectCode());
         buildKobRunner(beans);
         buildClientInfo(prop);
         ClientPath clientPathLocal = new ClientPath(client.getIp(),client.getIdentification(), client.getProjectCode(), client.getTasks());
@@ -193,7 +193,7 @@ public @Slf4j class ClientContext {
 
     public boolean buildZkClient() {
         try {
-            zkClient = new ZkClient(prop.getZkServers(), prop.getZkSessionTimeout(), prop.getZkConnectionTimeout(), new ZkSerializer() {
+            zkClient = new ZkClient(prop.getZkConnectString(), prop.getZkSessionTimeout(), prop.getZkConnectionTimeout(), new ZkSerializer() {
                 @Override
                 public byte[] serialize(Object data) throws ZkMarshallingError {
                     if (data instanceof String) {
@@ -213,7 +213,7 @@ public @Slf4j class ClientContext {
                 }
             }
         } catch (ZkTimeoutException e) {
-            log.error(ClientLogConstant.error507(prop.getZkServers(), prop.getZkConnectionTimeout()), e);
+            log.error(ClientLogConstant.error507(prop.getZkConnectString(), prop.getZkConnectionTimeout()), e);
             return false;
         } catch (Exception e) {
             log.error(ClientLogConstant.error508(), e);

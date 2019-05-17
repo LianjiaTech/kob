@@ -17,9 +17,9 @@ import java.util.List;
 
 public @NoArgsConstructor @Getter @Setter class ClientProperties {
     private String env;
-    private String cluster;
     private String projectCode;
-    private String zkServers;
+    private String zkConnectString;
+    private String zkPrefix;
     private Integer zkSessionTimeout;
     private Integer zkConnectionTimeout;
     private String adminUrl;
@@ -36,22 +36,22 @@ public @NoArgsConstructor @Getter @Setter class ClientProperties {
     private Long initialDelay;
     private Long heartbeatPeriod;
 
-    public ClientProperties(String env, String cluster, String zkServers, String adminUrl, boolean logWarnEnable) {
+    public ClientProperties(String env, String zkPrefix, String zkConnectString, String adminUrl, boolean logWarnEnable) {
         this.env = env;
-        this.cluster = cluster;
-        this.zkServers = zkServers;
+        this.zkPrefix = zkPrefix;
+        this.zkConnectString = zkConnectString;
         this.adminUrl = adminUrl;
         this.logWarnEnable = logWarnEnable;
     }
 
-    public void build() {
+    public ClientProperties build() {
         if (ClientConstant.OFFICIAL_ENV_LIST.contains(this.env)) {
             ClientProperties official = ClientConstant.OFFICIAL_ENV_MAP.get(ClientEnvConfiguration.ClientEnv.valueOf(env));
-            if (KobUtils.isEmpty(this.cluster)) {
-                this.cluster = official.cluster;
+            if (KobUtils.isEmpty(this.zkPrefix)) {
+                this.zkPrefix = official.zkPrefix;
             }
-            if (KobUtils.isEmpty(this.zkServers)) {
-                this.zkServers = official.zkServers;
+            if (KobUtils.isEmpty(this.zkConnectString)) {
+                this.zkConnectString = official.zkConnectString;
             }
             if (KobUtils.isEmpty(this.adminUrl)) {
                 this.adminUrl = official.adminUrl;
@@ -60,5 +60,6 @@ public @NoArgsConstructor @Getter @Setter class ClientProperties {
                 this.logWarnEnable = official.logWarnEnable;
             }
         }
+        return this;
     }
 }
