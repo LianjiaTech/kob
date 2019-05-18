@@ -16,4 +16,8 @@ public @NoArgsConstructor @Getter @Setter class TaskContext extends TaskBaseCont
      * 日志上报接口 目前使用http实现 详见：com.ke.kob.client.spring.logger.KobOkLogger
      */
     private @Getter @Setter KobLogger logger;
+
+    public TaskContext(Path path, Data data) {
+        super(path, data);
+    }
 }

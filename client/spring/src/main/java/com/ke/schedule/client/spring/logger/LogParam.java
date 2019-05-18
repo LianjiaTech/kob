@@ -9,13 +9,14 @@ public enum LogParam {
     uuid,
     project,
     key,
-    task,
+    task_uuid,
     exe_id,
     ip,
     version,
     token,
     log_mode,
     result_mode,
+    state,
     msg,
     now
 }

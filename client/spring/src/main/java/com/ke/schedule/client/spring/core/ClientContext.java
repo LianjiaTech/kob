@@ -46,11 +46,12 @@ public @Slf4j @NoArgsConstructor class ClientContext {
     private @Getter String clientTaskPath;
     private @Getter String clientNodePath;
     private @Getter String pathClientInfoLocal;
-    private Map<String, Pair<String, Function<TaskBaseContext, TaskResult>>> runner;
+    private @Getter Map<String, Pair<String, Function<TaskBaseContext, TaskResult>>> runner;
     private @Getter ThreadPoolExecutor pool;
     private @Getter
     TaskDispatcher2 dispatcher = new TaskDispatcher2(this);
     private @Getter String adminUrl;
+    private @Getter @Setter String processorPath;
     private String taskLogPath;
     private String serviceLogPath;
     private Integer clientWorks;
@@ -218,54 +219,4 @@ public @Slf4j @NoArgsConstructor class ClientContext {
         this.initialDelay = prop.getInitialDelay();
         client.setHeartbeatPeriod(prop.getHeartbeatPeriod());
     }
-
-
-    private void addRunner(String key, String cn, Function<TaskBaseContext, TaskResult> runner) {
-        this.runner.put(key, runner);
-        client.getTasks().put(key, cn);
-    }
-
-
-    public Function<TaskBaseContext, TaskResult> getRunners(String taskKey) {
-        return runner == null ? null : runner.get(taskKey);
-    }
-
-    public boolean buildZkClient() {
-        try {
-            zkClient = new ZkClient(prop.getZkConnectString(), prop.getZkSessionTimeout(), prop.getZkConnectionTimeout(), new ZkSerializer() {
-                @Override
-                public byte[] serialize(Object data) throws ZkMarshallingError {
-                    if (data instanceof String) {
-                        return ((String) data).getBytes();
-                    }
-                    return JSON.toJSONString(data).getBytes();
-                }
-
-                @Override
-                public Object deserialize(byte[] bytes) throws ZkMarshallingError {
-                    return new String(bytes);
-                }
-            });
-            if (!KobUtils.isEmpty(prop.getZkAuthInfo())) {
-                for (ZkAuthInfo auth : prop.getZkAuthInfo()) {
-                    zkClient.addAuthInfo(auth.getScheme(), auth.getAuth().getBytes());
-                }
-            }
-        } catch (ZkTimeoutException e) {
-            log.error(ClientLogConstant.error507(prop.getZkConnectString(), prop.getZkConnectionTimeout()), e);
-            return false;
-        } catch (Exception e) {
-            log.error(ClientLogConstant.error508(), e);
-            return false;
-        }
-        return true;
-    }
-
-    public OkHttpClient getOkHttpClient() {
-        return okHttpClient;
-    }
-
-//    public static String getAdminUrl() {
-//        return adminUrl;
-//    }
 }

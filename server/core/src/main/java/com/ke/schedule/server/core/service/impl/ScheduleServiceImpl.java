@@ -145,7 +145,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         context.getData().setProjectCode(tw.getProjectCode());
         context.getData().setJobUuid(tw.getJobUuid());
         context.getData().setJobCn(tw.getJobCn());
-        context.getData().setTaskUuid(tw.getTaskUuid());
+        context.getPath().setTaskUuid(tw.getTaskUuid());
         context.getPath().setTaskKey(tw.getTaskKey());
         context.getPath().setTriggerTime(tw.getTriggerTime());
         context.getPath().setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
@@ -176,7 +176,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         overstockTask.forEach(t ->{
             try {
                 curator.delete().forPath(t.getZkPath());
-                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, t.getData().getTaskUuid(), zp);
+                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, t.getPath().getTaskUuid(), zp);
             }catch (Exception e){
                 log.error("er",e);
             }
@@ -254,7 +254,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         context.getData().setProjectCode(retryTask.getProjectCode());
         context.getData().setJobUuid(retryTask.getJobUuid());
         context.getData().setJobCn(retryTask.getJobCn());
-        context.getData().setTaskUuid(retryTask.getTaskUuid());
+        context.getPath().setTaskUuid(retryTask.getTaskUuid());
         context.getPath().setTaskKey(retryTask.getTaskKey());
         context.getPath().setTriggerTime(retryTask.getTriggerTime());
         context.getPath().setDesignatedNode(retryTask.getInnerParamsBean().getDesignatedNode());

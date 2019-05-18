@@ -3,6 +3,7 @@ package com.ke.schedule.client.spring.logger;
 import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.model.ClientData;
 import com.ke.schedule.basic.model.LogMode;
+import com.ke.schedule.basic.model.TaskBaseContext;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
@@ -27,11 +28,6 @@ public class LoggerBuilder {
         return this;
     }
 
-    public LoggerBuilder setResultMode(ResultMode mode) {
-        this.json.put(LogParam.result_mode.name(), mode.name());
-        return this;
-    }
-
     public LoggerBuilder setMessage(String msg) {
         this.json.put(LogParam.msg.name(), msg);
         return this;
@@ -42,8 +38,20 @@ public class LoggerBuilder {
         return this;
     }
 
+
+
+    public LoggerBuilder path(TaskBaseContext.Path path) {
+        this.json.put(LogParam.task_uuid.name(), path.getTaskUuid());
+        return this;
+    }
+
     public RequestBody build() {
         MediaType media = MediaType.parse("application/json; charset=utf-8");
         return RequestBody.create(media, this.json.toJSONString());
+    }
+
+    public LoggerBuilder state(int state) {
+        this.json.put(LogParam.state.name(), state);
+        return this;
     }
 }

@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class TaskBaseContext implements Comparable<TaskBaseContext>{
+public class TaskBaseContext{
 
     private @Getter @Setter Path path;
     private @Getter @Setter Data data;
@@ -18,29 +18,19 @@ public class TaskBaseContext implements Comparable<TaskBaseContext>{
         this.data = new Data();
     }
 
+    public TaskBaseContext(Path path, Data data) {
+        this.path = path;
+        this.data = data;
+    }
+
     public String getZkPath() throws UnsupportedEncodingException {
         return URLEncoder.encode(JSONObject.toJSONString(this.path), "UTF-8");
     }
 
     /**
-     * 排序用于触发
-     *
-     * @param o 用于比较的作业事件
-     * @return 比较结果
-     */
-    @Override
-    public int compareTo(TaskBaseContext o) {
-        if (this == o) {
-            return 0;
-        }
-        int triggerCompare = Long.compare(this.path.triggerTime, o.path.getTriggerTime());
-        return triggerCompare == 0 ? this.data.taskUuid.compareTo(o.data.getTaskUuid()) : triggerCompare;
-    }
-
-    /**
      * 定义ZK path信息
      */
-    public static class Path{
+    public static class Path {
 
         /**
          * 任务方法

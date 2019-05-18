@@ -164,17 +164,4 @@ public @Slf4j class TaskDispatcher2 {
         });
     }
 
-    private boolean checkPoolSize() {
-        int active = clientContext.getPool().getActiveCount();
-        int max = clientContext.getPool().getMaximumPoolSize();
-        double value = new BigDecimal((float) active / max).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-        double loadFactor = clientContext.getClient().getLoadFactor();
-        if (value > loadFactor) {
-            if (clientContext.getClient().getLogWarnEnable()) {
-                log.warn(ClientLogConstant.warn404(loadFactor, clientContext.getClient().getIdentification(), active, max));
-            }
-            return true;
-        }
-        return false;
-    }
 }

@@ -127,7 +127,7 @@ class WaitingTask {
         context.getData().setProjectCode(tw.getProjectCode());
         context.getData().setJobUuid(tw.getJobUuid());
         context.getData().setJobCn(tw.getJobCn());
-        context.getData().setTaskUuid(tw.getTaskUuid());
+        context.getPath().setTaskUuid(tw.getTaskUuid());
         context.getPath().setTaskKey(tw.getTaskKey());
         context.getPath().setTriggerTime(tw.getTriggerTime());
         context.getPath().setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
@@ -231,7 +231,6 @@ class WaitingTask {
                         // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
                         tasks.add(task);
                     }
-                    Collections.sort(tasks);
                     List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - 30);
                     scheduleService.fireOverstockTask(overstockTask);
 
