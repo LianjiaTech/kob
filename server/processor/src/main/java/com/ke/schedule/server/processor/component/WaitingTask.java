@@ -231,6 +231,7 @@ class WaitingTask {
                         // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
                         tasks.add(task);
                     }
+                    //todo Collections.sort(tasks);
                     List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - 30);
                     scheduleService.fireOverstockTask(overstockTask);
 
