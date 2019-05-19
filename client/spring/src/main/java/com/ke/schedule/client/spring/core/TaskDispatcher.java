@@ -28,6 +28,7 @@ enum TaskDispatcher {
         }
         childs.forEach(child -> {
             try {
+                System.out.println(child);
                 dispatcher0(context, parent, child);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -41,8 +42,8 @@ enum TaskDispatcher {
         String full = parentPath + ZkPathConstant.BACKSLASH + child;
         if (ClientFunction.INSTANCE.fireExpire().test(new Object[]{path, client, full})) return;
         if (!client.getRunner().containsKey(path.getTaskKey())) return;
-        if (!client.getClient().getIdentification().equals(path.getDesignatedNode())) return;
-        if (!client.getClient().getIdentification().equals(path.getRecommendNode()))
+        if (!client.getData().getIdentification().equals(path.getDesignatedNode())) return;
+        if (!client.getData().getIdentification().equals(path.getRecommendNode()))
             ClientFunction.INSTANCE.sleep().accept(5);
         if (ClientFunction.INSTANCE.tryToExclusionNodeHasMe().test(new Object[]{path, client})) return;
         if (ClientFunction.INSTANCE.checkPoolSize().test(client)) return;
@@ -57,7 +58,7 @@ enum TaskDispatcher {
             e.printStackTrace();
         }
         if (client.getZkClient().delete(full)) {
-            log.info(ClientLogConstant.info100(JSON.toJSONString(path), client.getClient().getIdentification()));
+            log.info(ClientLogConstant.info100(JSON.toJSONString(path), client.getData().getIdentification()));
             OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.RECEIVE_SUCCESS);
             TaskContext context = new TaskContext(path, JSONObject.parseObject(data, TaskContext.Data.class));
             client.getPool().execute(() -> {
@@ -66,7 +67,7 @@ enum TaskDispatcher {
                     TaskResult result = client.getRunner().get(path.getTaskKey()).getValue().apply(context);
                     OkHttpLogger.INSTANCE.systemLog(client, path, result.getState());//todo msg
                 } catch (Exception e) {
-                    log.error(ClientLogConstant.error502(JSON.toJSONString(context), client.getClient().getIdentification()), e);
+                    log.error(ClientLogConstant.error502(JSON.toJSONString(context), client.getData().getIdentification()), e);
                     OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.EXECUTE_EXCEPTION);//todo e
                 }
             });

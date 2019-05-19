@@ -16,5 +16,5 @@ import java.lang.annotation.*;
 public @interface Task {
     String key();
 
-    String cn();
+    String remark();
 }

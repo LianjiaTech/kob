@@ -7,6 +7,9 @@ kob-schedule-client:
   zk-prefix: kob
   admin-url: http://localhost:8668
   log-warn-enable: true
+  threads: 10
+  zk-session-timeout: 4000
+  zk-connection-timeout: 4000
 
 #kob.client:
 #  env: official_develop

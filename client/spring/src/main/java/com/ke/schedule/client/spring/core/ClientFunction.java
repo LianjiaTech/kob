@@ -67,7 +67,7 @@ enum ClientFunction {
             TaskContext.Path path = (TaskContext.Path) objects[0];
             ClientContext client = (ClientContext) objects[1];
             return !StringUtils.isEmpty(path.getTryToExclusionNode())
-                    && path.getTryToExclusionNode().contains(client.getClient().getIdentification());
+                    && path.getTryToExclusionNode().contains(client.getData().getIdentification());
         };
     }
 
@@ -76,10 +76,10 @@ enum ClientFunction {
             int active = context.getPool().getActiveCount();
             int max = context.getPool().getMaximumPoolSize();
             double value = new BigDecimal((float) active / max).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            double loadFactor = context.getClient().getLoadFactor();
+            double loadFactor = context.getData().getLoadFactor();
             if (value > loadFactor) {
-                if (context.getClient().getLogWarnEnable()) {
-                    log.warn(ClientLogConstant.warn404(loadFactor, context.getClient().getIdentification(), active, max));
+                if (context.getData().getLogWarnEnable()) {
+                    log.warn(ClientLogConstant.warn404(loadFactor, context.getData().getIdentification(), active, max));
                 }
                 return true;
             }

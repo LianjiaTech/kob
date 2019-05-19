@@ -16,17 +16,17 @@ public enum OkHttpLogger {
 
     public void expireRecycling(ClientContext context, TaskBaseContext.Path path) {
         RequestBody body = new LoggerBuilder()
-                .client(context.getClient())
+                .client(context.getData())
                 .state(TaskRecordStateConstant.EXPIRE_RECYCLING)
                 .path(path).build();
-        OkHttpUtils.post(context.getProcessorPath(), body);
+        OkHttpUtils.post(context.getAdminUrl(), body);
     }
 
     public void systemLog(ClientContext context, TaskBaseContext.Path path, Integer state) {
         RequestBody body = new LoggerBuilder()
-                .client(context.getClient())
+                .client(context.getData())
                 .state(TaskRecordStateConstant.EXPIRE_RECYCLING)
                 .path(path).build();
-        OkHttpUtils.post(context.getProcessorPath(), body);
+        OkHttpUtils.post(context.getAdminUrl(), body);
     }
 }

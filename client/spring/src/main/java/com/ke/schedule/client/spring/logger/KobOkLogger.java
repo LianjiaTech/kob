@@ -33,14 +33,14 @@ public @Slf4j class KobOkLogger implements KobLogger {
     private String cluster;
 
     public KobOkLogger(ClientContext clientContext, TaskContext taskContext) {
-        this.adminUrl = clientContext.getProp().getAdminUrl();
-        this.systemLogPath = clientContext.getProp().getSystemLogPath();
-        this.serviceLogPath = clientContext.getProp().getServiceLogPath();
-        this.okHttpClient = clientContext.getOkHttpClient();
-        this.projectCode = taskContext.getData().getProjectCode();
-        this.taskUuid = taskContext.getData().getTaskUuid();
-        this.clientIdentification = clientContext.getClient().getIdentification();
-        this.cluster = clientContext.getProp().getZkPrefix();
+//        this.adminUrl = clientContext.getProp().getAdminUrl();
+//        this.systemLogPath = clientContext.getProp().getSystemLogPath();
+//        this.serviceLogPath = clientContext.getProp().getServiceLogPath();
+////        this.okHttpClient = clientContext.getOkHttpClient();
+//        this.projectCode = taskContext.getData().getProjectCode();
+////        this.taskUuid = taskContext.getData().getTaskUuid();
+//        this.clientIdentification = clientContext.getData().getIdentification();
+//        this.cluster = clientContext.getProp().getZkPrefix();
     }
 
     @Override
