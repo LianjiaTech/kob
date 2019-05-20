@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -48,13 +50,14 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public Map<String, ClientInfo> getClientNodes(String projectCode) throws Exception {
         String clientNodePath = ZkPathConstant.clientNodePath(zp, projectCode);
-        if (curator.checkExists().forPath(clientNodePath)!=null) {
+        if (curator.checkExists().forPath(clientNodePath)==null) {
             return new HashMap<>(0);
         }
         List<String> nodeClientStrList = curator.getChildren().forPath(clientNodePath);
         Map<String, ClientInfo> projectClientNode = new HashMap<>(10);
         if (!KobUtils.isEmpty(nodeClientStrList)) {
             for (String child : nodeClientStrList) {
+                child = URLDecoder.decode(child, "UTF-8");
                 ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
                 String path = ZkPathConstant.clientNodePath(zp, projectCode) + ZkPathConstant.BACKSLASH + child;
                 String dataStr = new String(curator.getData().forPath(path));

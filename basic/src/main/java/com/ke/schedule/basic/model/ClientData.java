@@ -1,10 +1,14 @@
 package com.ke.schedule.basic.model;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,4 +32,10 @@ public @NoArgsConstructor @Getter @Setter class ClientData implements Serializab
     private Integer workers;
     private Integer threads;
     private Long heartbeatPeriod;
+
+    public String getClientPath() throws UnsupportedEncodingException {
+        ClientPath path = new ClientPath(this.ip, this.identification, this.projectCode, this.tasks);
+        String json = JSONObject.toJSONString(path);
+        return URLEncoder.encode(JSONObject.toJSONString(json), "UTF-8");
+    }
 }

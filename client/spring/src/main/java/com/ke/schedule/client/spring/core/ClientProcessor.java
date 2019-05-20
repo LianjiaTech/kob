@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.I0Itec.zkclient.ZkClient;
 import org.apache.zookeeper.CreateMode;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -74,9 +75,9 @@ class ClientProcessor {
                 }
             }
 
-            private void heartbeat0() {
+            private void heartbeat0() throws UnsupportedEncodingException {
                 ZkClient zkClient = clientContext.getZkClient();
-                String path = clientContext.getClientNodePath()+ ZkPathConstant.BACKSLASH + clientContext.getData().getIdentification();
+                String path = clientContext.getClientNodePath()+ ZkPathConstant.BACKSLASH + clientContext.getData().getClientPath();
                 if (zkClient.exists(path)) {
                     zkClient.writeData(path, clientContext.getData());
                 } else {

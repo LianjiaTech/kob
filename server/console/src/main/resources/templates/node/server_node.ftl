@@ -13,14 +13,14 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group input-group">
-                                    <span class="input-group-addon">zk前缀</span>
+                                    <span class="input-group-addon">zk 前缀</span>
                                     <input class="form-control" value="kob" disabled>
                                 </div>
                             </div>
                             <div class="col-lg-1"></div>
                             <div class="col-lg-3">
                                 <div class="form-group input-group">
-                                    <span class="input-group-addon">mysql前缀</span>
+                                    <span class="input-group-addon">mysql 前缀</span>
                                     <input class="form-control" value="kob" disabled>
                                 </div>
                             </div>
