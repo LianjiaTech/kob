@@ -52,7 +52,7 @@ class WaitingTask {
 
 
     void initialize() {
-        WAITING_TASK_EXECUTOR.scheduleAtFixedRate(() -> pushWaitingTask(), 2000, 500, TimeUnit.MILLISECONDS);
+        WAITING_TASK_EXECUTOR.scheduleAtFixedRate(() -> pushWaitingTask(), 2000, 1000, TimeUnit.MILLISECONDS);
     }
 
     private void pushWaitingTask() {
@@ -192,8 +192,8 @@ class WaitingTask {
             List<String> nodeList = new ArrayList<>();
             if (!KobUtils.isEmpty(clientNodePathList)) {
                 for (String child : clientNodePathList) {
-                    ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
-                    nodeList.add(clientPath.getIdentification());
+//                  todo what mean  ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
+                    nodeList.add(child);
                 }
             }
             innerParams.setRecommendNode(NodeHashLoadBalance.doSelect(nodeList, tw.getJobUuid()));
