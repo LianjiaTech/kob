@@ -11,7 +11,7 @@ import okhttp3.RequestBody;
  */
 
 public enum OkHttpLogger {
-    //1
+    //INSTANCE
     INSTANCE;
 
     public void expireRecycling(ClientContext context, TaskBaseContext.Path path) {

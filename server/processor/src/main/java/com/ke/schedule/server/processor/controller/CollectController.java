@@ -1,9 +1,9 @@
 package com.ke.schedule.server.processor.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ke.schedule.basic.model.LogContext;
 import com.ke.schedule.server.core.model.oz.ResponseData;
 import com.ke.schedule.server.core.service.CollectService;
-import com.ke.schedule.basic.model.LogContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * @Author: zhaoyuguang
@@ -18,7 +20,10 @@ import javax.annotation.Resource;
  */
 @RequestMapping("/collect")
 @Controller
-public @Slf4j class CollectController {
+public @Slf4j
+class CollectController {
+
+    private static final ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(256);
 
     @Resource
     private CollectService collectService;
@@ -34,22 +39,15 @@ public @Slf4j class CollectController {
         try {
             log.info("system_logger request parameters: " + json.toJSONString());
             LogContext context = JSONObject.parseObject(json.toJSONString(), LogContext.class);
-            collectService.handleLogger(context);
-        } catch (Exception e){
+            pool.execute(() -> {
+                collectService.handleLogger(context);
+            });
+            if(pool.getActiveCount()>16){
+                log.info("send qw");
+            }
+        } catch (Exception e) {
             log.error("error", e);
         }
-        return new ResponseData();
-    }
-
-    /**
-     * 业务级日志访问地址
-     *
-     * @return ResponseData
-     */
-    @RequestMapping(value = "/service_collect.json")
-    @ResponseBody
-    public ResponseData serviceCollect(@RequestBody JSONObject json) {
-        System.out.println("service_logger request parameters:" + json.toJSONString());
         return new ResponseData();
     }
 

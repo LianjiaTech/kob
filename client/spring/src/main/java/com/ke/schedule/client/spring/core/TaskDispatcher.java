@@ -19,7 +19,7 @@ import java.util.List;
 
 public @Slf4j
 enum TaskDispatcher {
-    //1
+    //INSTANCE
     INSTANCE;
 
     public void dispatcher(ClientContext context, String parent, List<String> childs) {

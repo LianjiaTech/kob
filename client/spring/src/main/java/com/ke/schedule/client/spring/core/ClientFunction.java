@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 public @Slf4j
 enum ClientFunction {
-    //1
+    //INSTANCE
     INSTANCE;
 
     public Function<String, TaskContext.Path> convertPath() {

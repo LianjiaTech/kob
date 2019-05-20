@@ -24,9 +24,6 @@ public @NoArgsConstructor
 @Slf4j
 class ClientProcessor {
     private static final ScheduledExecutorService CLIENT_HEARTBEAT = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("kob-client-heartbeat", true));
-    //    private static final AtomicBoolean POWER = new AtomicBoolean(false);
-//    private static final AtomicBoolean CHECK_STEP = new AtomicBoolean(false);
-//    private static final AtomicBoolean WATCHER_STEP = new AtomicBoolean(false);
     private ClientContext clientContext;
 
     public ClientProcessor(ClientProperties prop, Map<String, Object> beans) {
@@ -87,58 +84,4 @@ class ClientProcessor {
             }
         }, 15, 60, TimeUnit.SECONDS);
     }
-
-//    private void heartbeat() {
-//        CLIENT_HEARTBEAT.scheduleAtFixedRate(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    if (ClientProcessor.POWER.get()) {
-//                        heartbeat0();
-//                    }
-//                } catch (Exception e) {
-//                    log.error(ClientLogConstant.error503(), e);
-//                }
-//            }
-//
-//            private void heartbeat0() {
-//                ZkClient zkClient = clientContext.getZkClient();
-//                if (zkClient == null) {
-//                    if (!clientContext.buildZkClient()) {
-//                        return;
-//                    }
-//                    zkClient = clientContext.getZkClient();
-//                }
-//                ClientData client = clientContext.getData();
-//                String clientNodePath = clientContext.getClientNodePath();
-//                if (!CHECK_STEP.get()) {
-//                    String clientTaskPath = clientContext.getClientTaskPath();
-//                    if (!zkClient.exists(clientTaskPath) || !zkClient.exists(clientNodePath)) {
-//                        log.error(ClientLogConstant.error504(client.getProjectCode()));
-//                        return;
-//                    }
-//                    CHECK_STEP.set(true);
-//                }
-//                String pathClientInfoLocal = clientContext.getPathClientInfoLocal();
-//                int workers = clientContext.getPool().getActiveCount();
-//                client.setThreads(workers);
-//                if (zkClient.exists(pathClientInfoLocal)) {
-//                    zkClient.writeData(pathClientInfoLocal, client);
-//                } else {
-//                    zkClient.createEphemeral(pathClientInfoLocal, client);
-//                }
-//                if (CHECK_STEP.get() && !WATCHER_STEP.get()) {
-//                    zkClient.subscribeChildChanges(clientContext.getClientTaskPath(), new IZkChildListener() {
-//                        @Override
-//                        public void handleChildChange(String parentPath, List<String> currentChilds) throws Exception {
-//                            TaskDispatcher.INSTANCE.dispatcher(clientContext, parentPath, currentChilds);
-//                        }
-//                    });
-//                    WATCHER_STEP.set(true);
-//                }
-//                log.info(ClientLogConstant.info102(clientContext.getProp().getHeartbeatPeriod(), workers, clientContext.getProp().getThreads()));
-//            }
-//        }, clientContext.getProp().getInitialDelay(), clientContext.getProp().getHeartbeatPeriod(), TimeUnit.SECONDS);
-//    }
-
 }

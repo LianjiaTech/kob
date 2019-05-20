@@ -5,7 +5,7 @@ kob-schedule-client:
   project-code: kob_monitor
   zk-connect-string: localhost:2181
   zk-prefix: kob
-  admin-url: http://localhost:8668
+  admin-url: http://localhost:8668/collect/system_collect.json
   log-warn-enable: true
   threads: 10
   zk-session-timeout: 4000

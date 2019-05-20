@@ -55,7 +55,7 @@ class ClientContext {
     static class Builder {
         private ClientContext context;
 
-        public Builder() {
+        Builder() {
             context = new ClientContext();
             context.runner = new ConcurrentHashMap<>();
         }
@@ -138,70 +138,4 @@ class ClientContext {
             return this;
         }
     }
-
-//
-//    public void build() {
-//        if (prop.getZkSessionTimeout() == null) {
-//            prop.setZkSessionTimeout(ClientConstant.DEFAULT_ZK_SESSION_TIMEOUT);
-//        }
-//        if (prop.getZkConnectionTimeout() == null) {
-//            prop.setZkConnectionTimeout(ClientConstant.DEFAULT_ZK_CONNECTION_TIMEOUT);
-//        }
-//        if (KobUtils.isEmpty(prop.getSystemLogPath())) {
-//            prop.setSystemLogPath(ClientConstant.DEFAULT_TASK_LOG_PATH);
-//        }
-//        if (KobUtils.isEmpty(prop.getServiceLogPath())) {
-//            prop.setServiceLogPath(ClientConstant.DEFAULT_SERVICE_LOG_PATH);
-//        }
-//        if (prop.getThreads() == null) {
-//            prop.setThreads(ClientConstant.DEFAULT_CLIENT_WORKS);
-//        }
-//        if (prop.getInitialDelay() == null) {
-//            prop.setInitialDelay(ClientConstant.DEFAULT_INITIAL_DELAY);
-//        }
-//        if (prop.getHeartbeatPeriod() == null) {
-//            prop.setHeartbeatPeriod(ClientConstant.DEFAULT_HEARTBEAT_PERIOD);
-//        }
-//        if (prop.getLogWarnEnable() == null) {
-//            prop.setLogWarnEnable(ClientConstant.DEFAULT_LOG_WARN_ENABLE);
-//        }
-//        if (prop.getExpireRecyclingSec() == null) {
-//            prop.setExpireRecyclingSec(ClientConstant.DEFAULT_EXPIRE_RECYCLING_SEC);
-//        }
-//        if (prop.getLoadFactor() == null) {
-//            prop.setLoadFactor(ClientConstant.DEFAULT_LOAD_FACTOR);
-//        }
-//        OkHttpClient.Builder okHttpClientBuilder = new OkHttpClient.Builder();
-//        okHttpClient = okHttpClientBuilder.build();
-//        clientTaskPath = ZkPathConstant.clientTaskPath(prop.getZkPrefix(), prop.getProjectCode());
-//        clientNodePath = ZkPathConstant.clientNodePath(prop.getZkPrefix(), prop.getProjectCode());
-//        buildKobRunner(beans);
-//        buildClientInfo(prop);
-//        ClientPath clientPathLocal = new ClientPath(data.getIp(),data.getIdentification(), data.getProjectCode(), data.getTasks());
-//        pathClientInfoLocal = clientNodePath + ZkPathConstant.BACKSLASH + JSON.toJSONString(clientPathLocal);
-//        pool = new ThreadPoolExecutor(prop.getThreads(), prop.getThreads(),0L, TimeUnit.MILLISECONDS,
-//                new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory("kob-schedule-performing"));
-//    }
-
-//    private void buildClientInfo(ClientProperties prop) {
-//        data.setVersion(ClientConstant.VERSION);
-//        String ip = IpUtils.getLocalAddress();
-//        data.setIp(ip);
-//        String uuid = UuidUtils.builder(UuidUtils.AbbrType.CI);
-//        data.setIdentification(ip + ZkPathConstant.HYPHEN + uuid);
-//        data.setProjectCode(prop.getProjectCode());
-//        Long now = System.currentTimeMillis();
-//        data.setCreated(now);
-//        data.setModified(now);
-//        this.adminUrl = prop.getAdminUrl();
-//        this.taskLogPath = ClientConstant.DEFAULT_TASK_LOG_PATH;
-//        this.serviceLogPath = ClientConstant.DEFAULT_SERVICE_LOG_PATH;
-//        this.clientWorks = prop.getThreads();
-//        data.setLogWarnEnable(prop.getLogWarnEnable());
-//        data.setExpireRecyclingTime(prop.getExpireRecyclingSec());
-//        data.setLoadFactor(prop.getLoadFactor());
-//        data.setThreads(prop.getThreads());
-//        this.initialDelay = prop.getInitialDelay();
-//        data.setHeartbeatPeriod(prop.getHeartbeatPeriod());
-//    }
 }
