@@ -57,8 +57,8 @@ public class NodeServiceImpl implements NodeService {
         Map<String, ClientInfo> projectClientNode = new HashMap<>(10);
         if (!KobUtils.isEmpty(nodeClientStrList)) {
             for (String child : nodeClientStrList) {
-                child = URLDecoder.decode(child, "UTF-8");
-                ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
+                String decode = URLDecoder.decode(child, "UTF-8");
+                ClientPath clientPath = JSONObject.parseObject(decode, ClientPath.class);
                 String path = ZkPathConstant.clientNodePath(zp, projectCode) + ZkPathConstant.BACKSLASH + child;
                 String dataStr = new String(curator.getData().forPath(path));
                 if (!KobUtils.isEmpty(dataStr)) {

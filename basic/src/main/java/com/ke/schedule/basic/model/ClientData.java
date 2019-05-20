@@ -36,6 +36,6 @@ public @NoArgsConstructor @Getter @Setter class ClientData implements Serializab
     public String getClientPath() throws UnsupportedEncodingException {
         ClientPath path = new ClientPath(this.ip, this.identification, this.projectCode, this.tasks);
         String json = JSONObject.toJSONString(path);
-        return URLEncoder.encode(JSONObject.toJSONString(json), "UTF-8");
+        return URLEncoder.encode(json, "UTF-8");
     }
 }
