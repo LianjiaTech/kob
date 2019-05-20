@@ -111,7 +111,6 @@ class WaitingTask {
                 List<String> taskPathList = curator.getChildren().forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
                 if (!CollectionUtils.isEmpty(taskPathList) && taskPathList.size() > 40) {
                     log.error("send qx");
-                    taskPathList.forEach(this::recoveryOverstockTask0);
                     List<TaskBaseContext.Path> paths = new ArrayList<>();
                     for (String s : taskPathList) {
                         TaskBaseContext.Path path = JSONObject.parseObject(s, TaskBaseContext.Path.class);
@@ -127,26 +126,5 @@ class WaitingTask {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void recoveryOverstockTask0(String s) {
-
-        int random100 = new Random().nextInt(AdminConstant.ONE_HUNDRED);
-        if (random100 < 10) {
-            List<String> taskPathList = curator.getChildren(ZkPathConstant.clientTaskPath(zp, projectCode));
-            if (!KobUtils.isEmpty(taskPathList) && taskPathList.size() > processorProperties.getTaskOverstockRecoveryThreshold()) {
-                List<TaskBaseContext> tasks = new ArrayList<>();
-                for (String s : taskPathList) {
-                    TaskBaseContext task = JSONObject.parseObject(s, TaskBaseContext.class);
-                    //todo
-                    // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
-                    tasks.add(task);
-                }
-                Collections.sort(tasks);
-                List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - processorProperties.getTaskOverstockRecoveryRetainCount());
-                scheduleService.fireOverstockTask(zkClient, overstockTask, serverContext.getZp());
-            }
-        }
-    }
     }
 }
