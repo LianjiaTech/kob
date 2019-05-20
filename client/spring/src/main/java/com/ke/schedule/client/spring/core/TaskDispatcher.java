@@ -42,13 +42,9 @@ enum TaskDispatcher {
         String full = parentPath + ZkPathConstant.BACKSLASH + child;
         if (ClientFunction.INSTANCE.fireExpire().test(new Object[]{path, client, full})) return;
         if (!client.getRunner().containsKey(path.getTaskKey())) return;
-        if (path.getDesignatedNode() != null) {
-            if (!client.getData().getIdentification().equals(path.getDesignatedNode())) return;
-        }
-        if (path.getRecommendNode() != null) {
-            if (!client.getData().getIdentification().equals(path.getRecommendNode()))
-                ClientFunction.INSTANCE.sleep().accept(5);
-        }
+        if (!client.getData().getIdentification().equals(path.getDesignatedNode())) return;
+        if (!client.getData().getIdentification().equals(path.getRecommendNode()))
+            ClientFunction.INSTANCE.sleep().accept(5);
         if (ClientFunction.INSTANCE.tryToExclusionNodeHasMe().test(new Object[]{path, client})) return;
         if (ClientFunction.INSTANCE.checkPoolSize().test(client)) return;
         dispatcher1(client, path, full);

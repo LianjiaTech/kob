@@ -76,7 +76,7 @@ enum ClientFunction {
             int active = context.getPool().getActiveCount();
             int max = context.getPool().getMaximumPoolSize();
             double value = new BigDecimal((float) active / max).setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue();
-            double loadFactor = 0.6;
+            double loadFactor = context.getData().getLoadFactor();
             if (value > loadFactor) {
                 if (context.getData().getLogWarnEnable()) {
                     log.warn(ClientLogConstant.warn404(loadFactor, context.getData().getIdentification(), active, max));

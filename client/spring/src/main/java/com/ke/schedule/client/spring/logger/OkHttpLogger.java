@@ -25,7 +25,7 @@ public enum OkHttpLogger {
     public void systemLog(ClientContext context, TaskBaseContext.Path path, Integer state) {
         RequestBody body = new LoggerBuilder()
                 .client(context.getData())
-                .state(state)
+                .state(TaskRecordStateConstant.EXPIRE_RECYCLING)
                 .path(path).build();
         OkHttpUtils.post(context.getAdminUrl(), body);
     }
