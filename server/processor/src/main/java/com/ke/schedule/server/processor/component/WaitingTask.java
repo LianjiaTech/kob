@@ -60,9 +60,9 @@ class WaitingTask {
 
     private void pushWaitingTask() {
         boolean create = false;
+        String path = ZkPathConstant.serverWaitPath(zp);
         try {
             System.out.println("WAITING_TASK_EXECUTOR");
-            String path = ZkPathConstant.serverWaitPath(zp);
             try {
                 byte[] b = curator.getData().forPath(path);
                 LockData exitLock = JSONObject.parseObject(new String(b), LockData.class);
@@ -84,7 +84,7 @@ class WaitingTask {
         }
         if (create) {
             try {
-                curator.delete().forPath(ZkPathConstant.serverCronPath(zp));
+                curator.delete().forPath(path);
             } catch (Exception e) {
                 log.error(AdminLogConstant.error9100(), e);
             }
