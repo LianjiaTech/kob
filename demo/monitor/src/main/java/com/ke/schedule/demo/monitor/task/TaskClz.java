@@ -17,6 +17,9 @@ public @Slf4j class TaskClz {
 
     @Task(key = "helloWorld", remark = "你好旅行者")
     public TaskResult helloWorld(TaskContext context) {
+        System.out.println("日志 =============");
+        System.out.println("日志 =============");
+        System.out.println("日志 =============");
         System.out.println(JSON.toJSONString(context));
         return TaskResult.success();
     }
