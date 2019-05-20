@@ -1,17 +1,14 @@
 package com.ke.schedule.server.processor.component;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ke.schedule.basic.constant.TaskRecordStateConstant;
 import com.ke.schedule.basic.constant.ZkPathConstant;
-import com.ke.schedule.basic.model.*;
-import com.ke.schedule.basic.support.KobUtils;
+import com.ke.schedule.basic.model.LockData;
+import com.ke.schedule.basic.model.TaskBaseContext;
 import com.ke.schedule.basic.support.NamedThreadFactory;
 import com.ke.schedule.server.core.common.AdminConstant;
 import com.ke.schedule.server.core.common.AdminLogConstant;
-import com.ke.schedule.server.core.common.NodeHashLoadBalance;
 import com.ke.schedule.server.core.mapper.TaskRecordMapper;
 import com.ke.schedule.server.core.mapper.TaskWaitingMapper;
-import com.ke.schedule.server.core.model.db.TaskRecord;
 import com.ke.schedule.server.core.model.db.TaskWaiting;
 import com.ke.schedule.server.core.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +20,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
