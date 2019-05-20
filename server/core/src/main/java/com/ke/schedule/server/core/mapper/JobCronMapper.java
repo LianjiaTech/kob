@@ -16,7 +16,7 @@ public interface JobCronMapper {
 
     String COLUMN = " id, project_code, project_name, job_uuid, job_type, job_cn, task_key, task_remark, task_type, load_balance, " +
             "suspend, batch_type, retry_type, rely, user_params, inner_params, cron_expression, last_generate_trigger_time, " +
-            "timeout_threshold, retry_count, failover, gmt_created, gmt_modified ";
+            "timeout_threshold, retry_count, failover, version, gmt_created, gmt_modified ";
 
     String TABLE = " ${prefix}_job_cron ";
 
@@ -39,20 +39,10 @@ public interface JobCronMapper {
             "#{jc.retryCount}, #{jc.failover}) ")
     int insertOne(@Param("jc") JobCron jobCron, @Param("prefix") String prefix);
 
-    /**
-     * 更新cron作业的最后生成触发时间
-     *
-     * @param jobUuid                 作业唯一标识
-     * @param cronExpression          cron表达式
-     * @param lastGenerateTriggerTime 更新前的最后触发时间
-     * @param timeAfter               要更新的最后触发时间
-     * @param prefix                 集群名称
-     * @return 影响结果集条数
-     */
     @Update("<script>" +
             "   update " + TABLE +
-            "   set last_generate_trigger_time = #{timeAfter} " +
-            "   where job_uuid = #{jobUuid} and cron_expression = #{cronExpression} " +
+            "   set last_generate_trigger_time = #{timeAfter}, version = version + 1 " +
+            "   where job_uuid = #{jobUuid} and cron_expression = #{cronExpression} and version = #{version} " +
             "   <choose>" +
             "      <when test='lastGenerateTriggerTime != null'> " +
             "          and last_generate_trigger_time = #{lastGenerateTriggerTime} " +
@@ -66,6 +56,7 @@ public interface JobCronMapper {
                                                     @Param("cronExpression") String cronExpression,
                                                     @Param("lastGenerateTriggerTime") Long lastGenerateTriggerTime,
                                                     @Param("timeAfter") Long timeAfter,
+                                                    @Param("version") Integer version,
                                                     @Param("prefix") String prefix);
 
     /**
@@ -122,12 +113,13 @@ public interface JobCronMapper {
      * @return
      */
     @Update("update " + TABLE +
-            "set suspend = #{exclamationSuspend}, last_generate_trigger_time = null " +
+            "set suspend = #{exclamationSuspend}, last_generate_trigger_time = null, version = version + 1 " +
             "where job_uuid = #{jobUuid} and project_code = #{projectCode} and suspend = #{suspend} ")
     int updateSuspend(@Param("exclamationSuspend") Boolean exclamationSuspend,
                       @Param("jobUuid") String jobUuid,
                       @Param("projectCode") String projectCode,
                       @Param("suspend") Boolean suspend,
+//             todo         @Param("version") Integer version,
                       @Param("prefix") String prefix);
 
     /**
@@ -157,12 +149,13 @@ public interface JobCronMapper {
      */
     @Update("update " + TABLE +
             "set task_remark = #{taskRemark}, cron_expression = #{cronExpression}, user_params = #{userParams}, " +
-            "last_generate_trigger_time = null " +
+            "last_generate_trigger_time = null, version = version + 1 " +
             "where job_uuid = #{jobUuid} and project_code = #{projectCode} ")
     int updateOne(@Param("taskRemark") String taskRemark,
                   @Param("cronExpression") String cronExpression,
                   @Param("userParams") String userParams,
                   @Param("jobUuid") String jobUuid,
                   @Param("projectCode") String projectCode,
+//             todo         @Param("version") Integer version,
                   @Param("prefix") String prefix);
 }

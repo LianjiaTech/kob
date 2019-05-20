@@ -11,6 +11,7 @@ import com.ke.schedule.server.core.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -25,7 +26,8 @@ import java.util.concurrent.TimeUnit;
  * @author zhaoyuguang
  */
 @Component
-public @Slf4j class CornTask {
+public @Slf4j
+class CornJob {
 
     private static final ScheduledExecutorService CRON_TASK_EXECUTOR = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("cron-task", true));
 
@@ -33,6 +35,8 @@ public @Slf4j class CornTask {
     private CuratorFramework curator;
     @Resource(name = "scheduleService")
     private ScheduleService scheduleService;
+    @Resource
+    private ServerContext context;
 
     @Value("${kob-schedule.zk-prefix}")
     private String zp;
@@ -40,24 +44,34 @@ public @Slf4j class CornTask {
     private String mp;
 
     void initialize() {
-        CRON_TASK_EXECUTOR.scheduleAtFixedRate(this::initializeCornTask, 10, 20, TimeUnit.SECONDS);
+        CRON_TASK_EXECUTOR.scheduleAtFixedRate(this::initializeCornTask, 10, 60, TimeUnit.SECONDS);
     }
 
-    private void initializeCornTask(){
+    private void initializeCornTask() {
         boolean create = false;
         try {
             System.out.println("CRON_TASK_EXECUTOR");
-            if(curator.checkExists().forPath(ZkPathConstant.serverCronPath(zp)) !=null){
-                byte[] b = curator.getData().forPath(ZkPathConstant.serverCronPath(zp));
-                b = b;
+            String path = ZkPathConstant.serverCronPath(zp);
+            try {
+                byte[] b = curator.getData().forPath(path);
+                LockData exitLock = JSONObject.parseObject(new String(b), LockData.class);
+                if (exitLock.getExpire() < System.currentTimeMillis()) {
+                    curator.delete().forPath(path);
+                } else {
+                    return;
+                }
+            } catch (KeeperException.NoNodeException e) {
+
             }
-            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(ZkPathConstant.serverCronPath(zp), JSONObject.toJSONString(new LockData("ip:xxx", System.currentTimeMillis()+1000*60*5)).getBytes());//todo
+            LockData lock = new LockData(context.getNode().getIdentification(), System.currentTimeMillis() + 1000 * 60 * 5);
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
             create = true;
             jobCronGenerateWaitingTask();
+
         } catch (Exception e) {
             log.error(AdminLogConstant.error9100(), e);
         }
-        if(create){
+        if (create) {
             try {
                 curator.delete().forPath(ZkPathConstant.serverCronPath(zp));
             } catch (Exception e) {
@@ -72,7 +86,7 @@ public @Slf4j class CornTask {
             Date now = new Date();
             jobCronList.forEach(c -> {
                 try {
-                    scheduleService.createCronWaitingTaskForTime("serverid", c, false, 10, now);//todo
+                    scheduleService.createCronWaitingTaskForTime(context.getNode().getIdentification(), c, false, 10, now);
                 } catch (Exception e) {
                     log.error(AdminLogConstant.error9101(JSONObject.toJSONString(c)), e);
                 }

@@ -105,7 +105,7 @@ public interface TaskRecordMapper {
 
     @Select("select " + COLUMN +
             "from " + TABLE +
-            "where  job_uuid = #{jobUuid} and ancestor = 1 and state != '" + TaskRecordStateConstant.RELY_UNDO + "' " +
+            "where  job_uuid = #{jobUuid} and state != '" + TaskRecordStateConstant.RELY_UNDO + "' " +
             "order by id desc " +
             "limit 1")
     TaskRecord selectLastUndoTaskByJobUuid(@Param("jobUuid") String jobUuid, @Param("prefix") String prefix);

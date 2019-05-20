@@ -1,25 +1,24 @@
 package com.ke.schedule.server.core.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ke.schedule.basic.constant.TaskRecordStateConstant;
+import com.ke.schedule.basic.constant.ZkPathConstant;
 import com.ke.schedule.basic.model.*;
-import com.ke.schedule.server.core.common.AdminConstant;
+import com.ke.schedule.basic.support.KobUtils;
+import com.ke.schedule.basic.support.UuidUtils;
+import com.ke.schedule.server.core.common.CronExpression;
+import com.ke.schedule.server.core.common.NodeHashLoadBalance;
 import com.ke.schedule.server.core.mapper.JobCronMapper;
 import com.ke.schedule.server.core.mapper.ProjectUserMapper;
 import com.ke.schedule.server.core.mapper.TaskRecordMapper;
 import com.ke.schedule.server.core.mapper.TaskWaitingMapper;
 import com.ke.schedule.server.core.model.db.JobCron;
-import com.ke.schedule.server.core.model.oz.BatchType;
-import com.ke.schedule.server.core.model.oz.RetryType;
-import com.ke.schedule.server.core.service.ScheduleService;
-import com.ke.schedule.server.core.common.CronExpression;
-import com.ke.schedule.server.core.common.NodeHashLoadBalance;
 import com.ke.schedule.server.core.model.db.ProjectUser;
 import com.ke.schedule.server.core.model.db.TaskRecord;
 import com.ke.schedule.server.core.model.db.TaskWaiting;
-import com.ke.schedule.basic.constant.TaskRecordStateConstant;
-import com.ke.schedule.basic.constant.ZkPathConstant;
-import com.ke.schedule.basic.support.KobUtils;
-import com.ke.schedule.basic.support.UuidUtils;
+import com.ke.schedule.server.core.model.oz.BatchType;
+import com.ke.schedule.server.core.model.oz.RetryType;
+import com.ke.schedule.server.core.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
@@ -29,7 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -38,7 +36,8 @@ import java.util.*;
  * @Date: 2018/7/30 下午2:51
  */
 @Service(value = "scheduleService")
-public @Slf4j class ScheduleServiceImpl implements ScheduleService {
+public @Slf4j
+class ScheduleServiceImpl implements ScheduleService {
 
     @Resource
     private JobCronMapper jobCronMapper;
@@ -129,7 +128,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         }
         if (!CollectionUtils.isEmpty(cronTaskWaitingList)) {
             int updateCount = jobCronMapper.updateRunningJobCronLastGenerateTriggerTime(jobCron.getJobUuid(),
-                    jobCron.getCronExpression(), lastGenerateTriggerTime, timeAfter.getTime(), mp);
+                    jobCron.getCronExpression(), lastGenerateTriggerTime, timeAfter.getTime(), jobCron.getVersion(), mp);
             if (updateCount != 1) {
                 log.error("job_cron data has change uuid:" + jobCron.getJobUuid());
                 throw new RuntimeException("job_cron data has change uuid:" + jobCron.getJobUuid());
@@ -140,7 +139,7 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void pushTask(TaskWaiting tw, String cluster) {
+    public void pushTask0(TaskWaiting tw, String cluster) {
         TaskBaseContext context = new TaskBaseContext();
         context.getData().setProjectCode(tw.getProjectCode());
         context.getData().setJobUuid(tw.getJobUuid());
@@ -172,13 +171,13 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void fireOverstockTask(List<TaskBaseContext> overstockTask) {
-        overstockTask.forEach(t ->{
+    public void fireOverstockTask(List<TaskBaseContext.Path> overstockTask) {
+        overstockTask.forEach(t -> {
             try {
-                curator.delete().forPath(t.getZkPath());
-                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, t.getPath().getTaskUuid(), zp);
-            }catch (Exception e){
-                log.error("er",e);
+                curator.delete().forPath(t.getPath());
+                taskRecordMapper.updateStateByTaskUuid(TaskRecordStateConstant.STACKED_RECYCLING, t.getTaskUuid(), zp);
+            } catch (Exception e) {
+                log.error("er", e);
             }
         });
     }
@@ -397,4 +396,105 @@ public @Slf4j class ScheduleServiceImpl implements ScheduleService {
         }
         return serviceProjectCodeSet;
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean pushTask(TaskWaiting tw, String identification) {
+        int deleteCount = taskWaitingMapper.deleteOne(tw.getTaskUuid(), mp);
+        if (deleteCount != 1) {
+            log.error("server_admin_code_error_100:删除等待任务数量不为1");
+            return false;
+        }
+
+        TaskRecord taskRecord = createCommonTaskRecord(tw, identification);
+        if (tw.getRely()) {
+            TaskRecord lastTask = taskRecordMapper.selectLastUndoTaskByJobUuid(tw.getJobUuid(), mp);
+            if (lastTask == null && TaskRecordStateConstant.isComplete(lastTask.getState())) {
+                taskRecord.setState(TaskRecordStateConstant.RELY_UNDO);
+                taskRecord.setComplete(true);
+                taskRecordMapper.insertOne(taskRecord, mp);
+                return false;
+            }
+        }
+
+        int insertCount = taskRecordMapper.insertOne(taskRecord, mp);
+        if (insertCount != 1) {
+            log.error("server_admin_code_error_101:插入任务记录数量不为1");
+            throw new RuntimeException("server_code_error_101:插入任务记录数量不为1");
+        }
+
+        TaskBaseContext context = new TaskBaseContext();
+        context.getData().setProjectCode(tw.getProjectCode());
+        context.getData().setJobUuid(tw.getJobUuid());
+        context.getData().setJobCn(tw.getJobCn());
+        context.getPath().setTaskUuid(tw.getTaskUuid());
+        context.getPath().setTaskKey(tw.getTaskKey());
+        context.getPath().setTriggerTime(tw.getTriggerTime());
+        context.getPath().setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
+        context.getPath().setRecommendNode(tw.getInnerParamsBean().getRecommendNode());
+        context.getPath().setTryToExclusionNode(tw.getInnerParamsBean().getTryToExclusionNode());
+        context.getData().setUserParam(JSONObject.parseObject(tw.getUserParams()));
+        String projectTaskPath = ZkPathConstant.clientTaskPath(zp, context.getData().getProjectCode());
+        int state = TaskRecordStateConstant.PUSH_SUCCESS;
+        Map<String, Object> param = new HashMap<>(10);
+        try {
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(projectTaskPath + ZkPathConstant.BACKSLASH + context.getZkPath(), JSONObject.toJSONString(context.getData()).getBytes());
+        } catch (Exception e) {
+            log.error("pushTask_error 推送zk事件异常", e);
+            state = TaskRecordStateConstant.PUSH_FAIL;
+            param.put("complete", true);
+        }
+        param.put("state", state);
+        taskRecordMapper.updateByTaskUuid(param, tw.getTaskUuid(), mp);
+        return true;
+    }
+
+    private TaskRecord createCommonTaskRecord(TaskWaiting tw, String serverIdentification) {
+        TaskRecord tr = new TaskRecord();
+        tr.setProjectCode(tw.getProjectCode());
+        tr.setProjectName(tw.getProjectName());
+        tr.setJobUuid(tw.getJobUuid());
+        tr.setJobType(tw.getJobType());
+        tr.setJobCn(tw.getJobCn());
+        tr.setTaskKey(tw.getTaskKey());
+        tr.setTaskRemark(tw.getTaskRemark());
+        tr.setTaskType(TaskType.NONE.name());
+        tr.setTaskUuid(tw.getTaskUuid());
+        tr.setRelationTaskUuid(tw.getTaskUuid());
+        tr.setLoadBalance(tw.getLoadBalance());
+        tr.setRetryType(tw.getRetryType());
+        tr.setBatchType(tw.getBatchType());
+        tr.setRely(tw.getRely());
+        tr.setAncestor(true);
+        tr.setUserParams(tw.getUserParams());
+        tr.setClientIdentification("");
+        InnerParams innerParams = KobUtils.isEmpty(tw.getInnerParams()) ? new InnerParams() : JSONObject.parseObject(tw.getInnerParams(), InnerParams.class);
+        innerParams.setTaskPushNode(serverIdentification);
+        if (LoadBalanceType.NODE_HASH.name().equals(tw.getLoadBalance())) {
+            List<String> clientNodePathList = null;
+            try {
+                clientNodePathList = curator.getChildren().forPath(ZkPathConstant.clientNodePath(zp, tw.getProjectCode()));
+            } catch (Exception e) {
+                //todo
+                log.error("e", e);
+            }
+            List<String> nodeList = new ArrayList<>();
+            if (!KobUtils.isEmpty(clientNodePathList)) {
+                for (String child : clientNodePathList) {
+//                  todo what mean  ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
+                    nodeList.add(child);
+                }
+            }
+            innerParams.setRecommendNode(NodeHashLoadBalance.doSelect(nodeList, tw.getJobUuid()));
+        }
+
+        tr.setCronExpression(tw.getCronExpression());
+        tr.setTimeoutThreshold(tw.getTimeoutThreshold());
+        tr.setState(TaskRecordStateConstant.WAITING_PUSH);
+        tr.setInnerParams(JSONObject.toJSONString(innerParams));
+        tr.setRetryCount(tw.getRetryCount());
+        tr.setTriggerTime(tw.getTriggerTime());
+        return tr;
+    }
+
 }

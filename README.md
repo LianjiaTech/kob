@@ -125,7 +125,7 @@ mvn clean install -DskipTests
 #### Client配置文件 
 ```java
 kob.client:
-  cluster: incubator
+  zp: incubator
   project_code: kob_monitor
   Zookeeper_servers: localhost:2801
   admin_url: http://localhost:8668

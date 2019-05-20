@@ -64,7 +64,7 @@
         {{each rows as row index}}
         <tr>
             <td>{{row.identification}}</td>
-            <td>{{row.cluster}}</td>
+            <td>{{row.zp}}</td>
             <td>{{row.ip}}</td>
             <td>{{row.created | format:'timestampFormat',row.created}}</td>
         </tr>

@@ -17,6 +17,7 @@ import com.ke.schedule.server.core.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -44,6 +45,8 @@ class WaitingTask {
     private TaskWaitingMapper taskWaitingMapper;
     @Resource
     private TaskRecordMapper taskRecordMapper;
+    @Resource
+    private ServerContext context;
 
     @Value("${kob-schedule.zk-prefix}")
     private String zp;
@@ -57,28 +60,31 @@ class WaitingTask {
 
     private void pushWaitingTask() {
         boolean create = false;
-        String path = ZkPathConstant.serverWaitPath(zp);
         try {
             System.out.println("WAITING_TASK_EXECUTOR");
-            if (curator.checkExists().forPath(path) != null) {
+            String path = ZkPathConstant.serverWaitPath(zp);
+            try {
                 byte[] b = curator.getData().forPath(path);
-                String s = new String(b);
-                LockData data = JSONObject.parseObject(s, LockData.class);
-                if(data.getExpire()>System.currentTimeMillis()){
+                LockData exitLock = JSONObject.parseObject(new String(b), LockData.class);
+                if (exitLock.getExpire() < System.currentTimeMillis()) {
                     curator.delete().forPath(path);
-                }else {
+                } else {
                     return;
                 }
+            } catch (KeeperException.NoNodeException e) {
+
             }
-            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(new LockData("ip:xxx", System.currentTimeMillis() + 1000 * 60 * 5)).getBytes());//todo
-            pushWaitingTask0();
+            LockData lock = new LockData(context.getNode().getIdentification(), System.currentTimeMillis() + 1000 * 20);
+            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
             create = true;
+            pushWaitingTask0();
+
         } catch (Exception e) {
             log.error(AdminLogConstant.error9100(), e);
         }
         if (create) {
             try {
-                curator.delete().forPath(path);
+                curator.delete().forPath(ZkPathConstant.serverCronPath(zp));
             } catch (Exception e) {
                 log.error(AdminLogConstant.error9100(), e);
             }
@@ -87,152 +93,33 @@ class WaitingTask {
 
     private void pushWaitingTask0() {
         long now = System.currentTimeMillis();
-        List<TaskWaiting> taskWaitingList = scheduleService.findTriggerTaskInLimit(now, 10, mp);
+        List<TaskWaiting> taskWaitingList = scheduleService.findTriggerTaskInLimit(now, 100, mp);
         if (!CollectionUtils.isEmpty(taskWaitingList)) {
-            taskWaitingList.forEach(this::pushWaitingTask1);
+            taskWaitingList.forEach(e -> {
+                recoveryOverstockTask(e.getProjectCode());
+                boolean finish = scheduleService.pushTask(e, context.getNode().getIdentification());
+            });
         }
     }
 
-    private void pushWaitingTask1(TaskWaiting tw) {
-        //todo delete insert
-        //todo overtime put or update
-        Boolean lastTaskComplete = null;
-        String relyUndoTaskUuid = null;
 
-        int deleteCount = taskWaitingMapper.deleteOne(tw.getTaskUuid(), mp);
-        if (deleteCount != 1) {
-            log.error("server_admin_code_error_100:删除等待任务数量不为1");
-            return;
-        }
-        TaskRecord taskRecord = createCommonTaskRecord(tw, "serverId", lastTaskComplete, relyUndoTaskUuid);
-        if (tw.getRely()) {
-            TaskRecord lastTask = taskRecordMapper.selectLastUndoTaskByJobUuid(tw.getJobUuid(), mp);
-            if (lastTask == null && lastTask.getComplete()) {
-                taskRecord.setComplete(true);
-                taskRecordMapper.insertOne(taskRecord, mp);
-                return;
-            }
-        }
-        //todo 如果于现在时间差别很大 直接丢掉
-
-        int insertCount = taskRecordMapper.insertOne(taskRecord, mp);
-        if (insertCount != 1) {
-            log.error("server_admin_code_error_101:插入任务记录数量不为1");
-            throw new RuntimeException("server_code_error_101:插入任务记录数量不为1");
-        }
-        //todo 检查zk
-        recoveryOverstockTask(taskRecord.getProjectCode());
-
-        TaskBaseContext context = new TaskBaseContext();
-        context.getData().setProjectCode(tw.getProjectCode());
-        context.getData().setJobUuid(tw.getJobUuid());
-        context.getData().setJobCn(tw.getJobCn());
-        context.getPath().setTaskUuid(tw.getTaskUuid());
-        context.getPath().setTaskKey(tw.getTaskKey());
-        context.getPath().setTriggerTime(tw.getTriggerTime());
-        context.getPath().setDesignatedNode(tw.getInnerParamsBean().getDesignatedNode());
-        context.getPath().setRecommendNode(tw.getInnerParamsBean().getRecommendNode());
-        context.getPath().setTryToExclusionNode(tw.getInnerParamsBean().getTryToExclusionNode());
-        context.getData().setUserParam(JSONObject.parseObject(tw.getUserParams()));
-        String projectTaskPath = ZkPathConstant.clientTaskPath(zp, context.getData().getProjectCode());
-        int state = TaskRecordStateConstant.PUSH_SUCCESS;
-        Map<String, Object> param = new HashMap<>(10);
-        try {
-            curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(projectTaskPath + ZkPathConstant.BACKSLASH + context.getZkPath());
-        } catch (Exception e) {
-            log.error("pushTask_error 推送zk事件异常", e);
-            state = TaskRecordStateConstant.PUSH_FAIL;
-            param.put("complete", true);
-        }
-        param.put("state", state);
-        taskRecordMapper.updateByTaskUuid(param, tw.getTaskUuid(), mp);
-
-    }
-
-
-    /**
-     * 生成通用任务记录
-     *
-     * @param tw                   等待推送任务
-     * @param serverIdentification server节点唯一标识
-     * @param lastTaskComplete     上一次作业是否完成
-     * @param relyUndoTaskUuid     是否依赖上周期的uuid
-     * @return 任务记录
-     */
-    private TaskRecord createCommonTaskRecord(TaskWaiting tw, String serverIdentification, Boolean lastTaskComplete,
-                                              String relyUndoTaskUuid) {
-        TaskRecord tr = new TaskRecord();
-        tr.setProjectCode(tw.getProjectCode());
-        tr.setProjectName(tw.getProjectName());
-        tr.setJobUuid(tw.getJobUuid());
-        tr.setJobType(tw.getJobType());
-        tr.setJobCn(tw.getJobCn());
-        tr.setTaskKey(tw.getTaskKey());
-        tr.setTaskRemark(tw.getTaskRemark());
-        tr.setTaskType(TaskType.NONE.name());
-        tr.setTaskUuid(tw.getTaskUuid());
-        tr.setRelationTaskUuid(tw.getTaskUuid());
-        tr.setLoadBalance(tw.getLoadBalance());
-        tr.setRetryType(tw.getRetryType());
-        tr.setBatchType(tw.getBatchType());
-        tr.setRely(tw.getRely());
-        tr.setAncestor(true);
-        tr.setUserParams(tw.getUserParams());
-        tr.setClientIdentification("");
-        InnerParams innerParams = KobUtils.isEmpty(tw.getInnerParams()) ? new InnerParams() : JSONObject.parseObject(tw.getInnerParams(), InnerParams.class);
-        innerParams.setTaskPushNode(serverIdentification);
-        if (LoadBalanceType.NODE_HASH.name().equals(tw.getLoadBalance())) {
-            List<String> clientNodePathList = null;
-            try {
-                clientNodePathList = curator.getChildren().forPath(ZkPathConstant.clientNodePath(zp, tw.getProjectCode()));
-            } catch (Exception e) {
-                //todo
-                log.error("e", e);
-            }
-            List<String> nodeList = new ArrayList<>();
-            if (!KobUtils.isEmpty(clientNodePathList)) {
-                for (String child : clientNodePathList) {
-//                  todo what mean  ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
-                    nodeList.add(child);
-                }
-            }
-            innerParams.setRecommendNode(NodeHashLoadBalance.doSelect(nodeList, tw.getJobUuid()));
-            innerParams.setRelyUndoTaskUuid(relyUndoTaskUuid);
-        }
-
-        tr.setCronExpression(tw.getCronExpression());
-        tr.setTimeoutThreshold(tw.getTimeoutThreshold());
-        if (tw.getRely()) {
-            tr.setState(lastTaskComplete ? TaskRecordStateConstant.WAITING_PUSH : TaskRecordStateConstant.RELY_UNDO);
-            tr.setComplete(!lastTaskComplete);
-            innerParams.setRelyUndoTaskUuid(relyUndoTaskUuid);
-        } else {
-            tr.setState(TaskRecordStateConstant.WAITING_PUSH);
-            tr.setComplete(false);
-        }
-        tr.setInnerParams(JSONObject.toJSONString(innerParams));
-        tr.setRetryCount(tw.getRetryCount());
-        tr.setTriggerTime(tw.getTriggerTime());
-        return tr;
-    }
 
     private void recoveryOverstockTask(String projectCode) {
         try {
             int random100 = new Random().nextInt(AdminConstant.ONE_HUNDRED);
-            if (random100 < 20) {
+            if (random100 < 10) {
                 List<String> taskPathList = curator.getChildren().forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
                 if (!CollectionUtils.isEmpty(taskPathList) && taskPathList.size() > 40) {
                     log.error("send qx");
                     taskPathList.forEach(this::recoveryOverstockTask0);
-                    List<TaskBaseContext> tasks = new ArrayList<>();
+                    List<TaskBaseContext.Path> paths = new ArrayList<>();
                     for (String s : taskPathList) {
-                        TaskBaseContext task = JSONObject.parseObject(s, TaskBaseContext.class);
-                        //todo
-                        // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
-                        tasks.add(task);
+                        TaskBaseContext.Path path = JSONObject.parseObject(s, TaskBaseContext.Path.class);
+                        path.setPath(s);
+                        paths.add(path);
                     }
-                    //todo Collections.sort(tasks);
-                    List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - 30);
+                    Collections.sort(paths);
+                    List<TaskBaseContext.Path> overstockTask = paths.subList(0, paths.size() - 30);
                     scheduleService.fireOverstockTask(overstockTask);
 
                 }
@@ -243,5 +130,23 @@ class WaitingTask {
     }
 
     private void recoveryOverstockTask0(String s) {
+
+        int random100 = new Random().nextInt(AdminConstant.ONE_HUNDRED);
+        if (random100 < 10) {
+            List<String> taskPathList = curator.getChildren(ZkPathConstant.clientTaskPath(zp, projectCode));
+            if (!KobUtils.isEmpty(taskPathList) && taskPathList.size() > processorProperties.getTaskOverstockRecoveryThreshold()) {
+                List<TaskBaseContext> tasks = new ArrayList<>();
+                for (String s : taskPathList) {
+                    TaskBaseContext task = JSONObject.parseObject(s, TaskBaseContext.class);
+                    //todo
+                    // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
+                    tasks.add(task);
+                }
+                Collections.sort(tasks);
+                List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - processorProperties.getTaskOverstockRecoveryRetainCount());
+                scheduleService.fireOverstockTask(zkClient, overstockTask, serverContext.getZp());
+            }
+        }
+    }
     }
 }

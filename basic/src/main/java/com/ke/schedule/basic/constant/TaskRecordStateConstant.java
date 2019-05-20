@@ -51,4 +51,8 @@ public class TaskRecordStateConstant {
      * 执行过期
      */
     public static final int EXECUTE_EXPIRE = 73;
+
+    public static boolean isComplete(int state){
+        return state == EXECUTE_SUCCESS || state == EXECUTE_FAIL || state == EXECUTE_EXCEPTION || state == EXECUTE_EXPIRE;
+    }
 }

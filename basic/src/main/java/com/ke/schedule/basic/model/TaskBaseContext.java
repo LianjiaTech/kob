@@ -30,7 +30,7 @@ public class TaskBaseContext{
     /**
      * 定义ZK path信息
      */
-    public static class Path {
+    public @NoArgsConstructor static class Path implements Comparable<TaskBaseContext.Path>{
 
         /**
          * 任务方法
@@ -60,6 +60,13 @@ public class TaskBaseContext{
          * 逗号分隔排除执行节点
          */
         private @Getter @Setter String tryToExclusionNode;
+
+        private @Getter @Setter String path;
+
+        @Override
+        public int compareTo(Path o) {
+            return Long.compare(this.triggerTime, o.getTriggerTime());
+        }
     }
 
     /**

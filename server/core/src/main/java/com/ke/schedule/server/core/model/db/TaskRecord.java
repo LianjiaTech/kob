@@ -109,6 +109,7 @@ public @NoArgsConstructor @Getter @Setter class TaskRecord implements Serializab
     /**
      * 是否完成
      */
+    @Deprecated
     private Boolean complete;
     /**
      * 重试次数

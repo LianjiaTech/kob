@@ -18,15 +18,17 @@ public @NoArgsConstructor @Getter @Setter class NodeServer implements Serializab
     private static final long serialVersionUID = -1675592794365881127L;
 
     private String identification;
-    private String cluster;
+    private String zp;
+    private String mp;
     private String ip;
     private String uuid;
     private String state;
     private long created;
 
-    public NodeServer(String cluster, String ip, String uuid, long created) {
+    public NodeServer(String zp, String mp, String ip, String uuid, long created) {
         this.identification = ip + "_" + uuid;
-        this.cluster = cluster;
+        this.zp = zp;
+        this.mp = mp;
         this.ip = ip;
         this.uuid = uuid;
         this.created = created;

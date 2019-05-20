@@ -24,11 +24,11 @@ public interface ScheduleService {
 
     void createCronWaitingTaskForTime(String serverIdentification, JobCron jobCron, boolean appendPreviousTask, Integer intervalMin, Date now);
 
-    void pushTask(TaskWaiting tw, String cluster);
+    void pushTask0(TaskWaiting tw, String cluster);
 
     Boolean lockPushTask(TaskWaiting tw, String cluster, String serverIdentification);
 
-    void fireOverstockTask(List<TaskBaseContext> overstockTask);
+    void fireOverstockTask(List<TaskBaseContext.Path> overstockTask);
 
     int selectCountExpireTaskRecord(long now, String cluster);
 
@@ -63,4 +63,6 @@ public interface ScheduleService {
     void editJobCron(JobCron editJobCron);
 
     Set<String> selectServiceProjectCodeSet();
+
+    boolean pushTask(TaskWaiting tw, String identification);
 }

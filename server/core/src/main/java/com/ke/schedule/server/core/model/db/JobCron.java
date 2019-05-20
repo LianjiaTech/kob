@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 数据库实体类 对应数据表 kob_job_cron_$cluster 等待执行表
+ * 数据库实体类 对应数据表 kob_job_cron_$zp 等待执行表
  *
  * @Author: zhaoyuguang
  * @Date: 2018/7/30 下午3:28

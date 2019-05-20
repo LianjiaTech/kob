@@ -12,7 +12,7 @@ import javax.annotation.Resource;
 public class Kernel implements InitializingBean {
 
     @Resource
-    private CornTask cornTask;
+    private CornJob cornTask;
     @Resource
     private WaitingTask waitingTask;
     @Resource

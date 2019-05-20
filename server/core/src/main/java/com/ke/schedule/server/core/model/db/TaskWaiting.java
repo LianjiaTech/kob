@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 数据库实体类 对应数据表 kob_task_waiting_$cluster 等待执行表
+ * 数据库实体类 对应数据表 kob_task_waiting_$zp 等待执行表
  *
  * @Author: zhaoyuguang
  * @Date: 2018/7/30 上午11:58
