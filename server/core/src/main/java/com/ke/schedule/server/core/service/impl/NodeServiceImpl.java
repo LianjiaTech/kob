@@ -73,14 +73,15 @@ public class NodeServiceImpl implements NodeService {
     @Override
     public Map<String, ClientPath> getClientPaths(String projectCode) throws Exception {
         String clientNodePath = ZkPathConstant.clientNodePath(zp, projectCode);
-        if (curator.checkExists().forPath(clientNodePath)!=null) {
+        if (curator.checkExists().forPath(clientNodePath)==null) {
             return null;
         }
         List<String> nodePathStrList = curator.getChildren().forPath(clientNodePath);
         Map<String, ClientPath> projectClientPath = new HashMap<>(10);
         if (!KobUtils.isEmpty(nodePathStrList)) {
             for (String child : nodePathStrList) {
-                ClientPath clientPath = JSONObject.parseObject(child, ClientPath.class);
+                String decode = URLDecoder.decode(child, "UTF-8");
+                ClientPath clientPath = JSONObject.parseObject(decode, ClientPath.class);
                 projectClientPath.put(clientPath.getIdentification(), clientPath);
             }
         }

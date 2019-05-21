@@ -41,6 +41,11 @@ public interface ProjectUserMapper {
             "where project_code = #{projectCode} ")
     int selectCountByProjectCode(@Param("projectCode") String projectCode, @Param("prefix") String prefix);
 
+    @Select("select * " +
+            "from " + TABLE +
+            "where project_code = #{projectCode} and user_code = #{userCode} ")
+    ProjectUser selectOneByProjectCodeAndUserCode(@Param("projectCode") String projectCode, @Param("userCode") String userCode, @Param("prefix") String prefix);
+
     /**
      * 分页查询用户量
      *
@@ -96,4 +101,9 @@ public interface ProjectUserMapper {
             "where owner = 1 " +
             "order by id desc ")
     List<ProjectUser> selectProjectIsOwner(@Param("prefix") String prefix);
+
+    @Update("update " + TABLE +
+            "set configuration = #{p.configuration} " +
+            "where id = #{p.id}")
+    int updateConfiguration(@Param("p")ProjectUser projectUser, @Param("prefix") String prefix);
 }

@@ -55,7 +55,7 @@
         <thead>
         <tr>
             <th data-toggle="true">节点标识</th>
-            <th>集群名称</th>
+            <#--<th>集群名称</th>-->
             <th>节点IP</th>
             <th>创建时间</th>
         </tr>
@@ -64,14 +64,14 @@
         {{each rows as row index}}
         <tr>
             <td>{{row.identification}}</td>
-            <td>{{row.zp}}</td>
+            <#--<td>{{row.zp}}</td>-->
             <td>{{row.ip}}</td>
             <td>{{row.created | format:'timestampFormat',row.created}}</td>
         </tr>
         {{/each}}
         {{if results == 0}}
         <tr>
-            <td colspan="4">暂无数据</td>
+            <td colspan="3">暂无数据</td>
         </tr>
         {{/if}}
         </tbody>

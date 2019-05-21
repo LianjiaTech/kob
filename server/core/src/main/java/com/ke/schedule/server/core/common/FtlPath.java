@@ -27,6 +27,7 @@ public interface FtlPath {
      * 项目管理 - 人员管理
      */
     String PROJECT_USER_PATH = "./manager/project_user.ftl";
+    String PERSON_CONFIG_PATH = "./manager/person_config.ftl";
     /**
      * 节点信息-客户端节点
      */

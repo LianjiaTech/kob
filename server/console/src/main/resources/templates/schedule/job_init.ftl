@@ -165,7 +165,9 @@
             params['designated_node'] = _designated_node;
             post('/schedule/job_add.json', params, function (data) {
                 if (data && data.success) {
-                    swal('保存成功');
+                    swal('保存成功').then(function() {
+                        window.location.replace("/schedule/job_init.htm");
+                    });
                 } else {
                     swal('保存失败 ' + data.message);
                 }

@@ -20,4 +20,18 @@ public @NoArgsConstructor @Getter @Setter class ClientPath implements Serializab
         this.projectCode = projectCode;
         this.tasks = tasks;
     }
+
+    public int getTaskSize() {
+        return tasks == null ? 0 : tasks.size();
+    }
+
+    public String getTasksDesc() {
+        if (tasks == null) {
+            return "";
+        } else {
+            StringBuffer desc = new StringBuffer();
+            tasks.forEach((k, v) -> desc.append("key：" + k + " &nbsp; &nbsp; &nbsp; &nbsp; remark：" + v));
+            return desc.toString();
+        }
+    }
 }

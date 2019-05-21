@@ -14,6 +14,9 @@
                     <li>
                         <a href="/manager/project_user.htm">人员管理</a>
                     </li>
+                    <li>
+                        <a href="/manager/person_config.htm">个人配置</a>
+                    </li>
                 </#if>
                 </ul>
             </li>

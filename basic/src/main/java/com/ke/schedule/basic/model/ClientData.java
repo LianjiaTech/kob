@@ -29,7 +29,7 @@ public @NoArgsConstructor @Getter @Setter class ClientData implements Serializab
     private Boolean logWarnEnable;
     private Integer expireRecyclingTime;
     private Double loadFactor;
-    private Integer workers;
+    private Integer workers = 0;
     private Integer threads;
     private Long heartbeatPeriod;
 

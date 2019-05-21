@@ -1,12 +1,15 @@
 package com.ke.schedule.server.console.controller;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.constant.ZkPathConstant;
 import com.ke.schedule.basic.support.KobUtils;
 import com.ke.schedule.server.core.common.Attribute;
 import com.ke.schedule.server.core.common.FtlPath;
+import com.ke.schedule.server.core.mapper.ProjectUserMapper;
 import com.ke.schedule.server.core.model.db.ProjectUser;
 import com.ke.schedule.server.core.model.db.User;
 import com.ke.schedule.server.core.model.oz.ResponseData;
+import com.ke.schedule.server.core.model.oz.UserConfiguration;
 import com.ke.schedule.server.core.service.IndexService;
 import com.ke.schedule.server.core.service.ManagerService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +45,8 @@ class ManagerController {
     private IndexService indexService;
     @Resource(name = "managerService")
     private ManagerService managerService;
+    @Resource
+    private ProjectUserMapper projectUserMapper;
     @Value("${kob-schedule.zk-prefix}")
     private String zp;
 
@@ -173,6 +178,33 @@ class ManagerController {
         }
         ProjectUser projectUser = (ProjectUser) request.getSession().getAttribute(Attribute.PROJECT_SELECTED);
         managerService.deleteProjectUser(projectUser.getProjectCode(), id);
+        return ResponseData.success();
+    }
+
+    @RequestMapping(value = "/person_config.htm")
+    public String personConfig(Model model) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        ProjectUser projectUser = (ProjectUser) request.getSession().getAttribute(Attribute.PROJECT_SELECTED);
+        model.addAttribute("config", projectUser);
+        model.addAttribute(Attribute.INDEX_SCREEN, FtlPath.PERSON_CONFIG_PATH);
+        return FtlPath.INDEX_PATH;
+    }
+
+    @RequestMapping(value = "/person_config_save.json")
+    @ResponseBody
+    public ResponseData personConfigSave() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        String send = request.getParameter("send");
+        String run = request.getParameter("run");
+        String end = request.getParameter("end");
+        ProjectUser projectUser = (ProjectUser) request.getSession().getAttribute(Attribute.PROJECT_SELECTED);
+        UserConfiguration userConfiguration = projectUser.getUserConfiguration();
+        userConfiguration.setSend(send);
+        userConfiguration.setRun(run);
+        userConfiguration.setEnd(end);
+        projectUser.setConfiguration(JSONObject.toJSONString(userConfiguration));
+        projectUserMapper.updateConfiguration(projectUser, zp);
+        request.getSession().setAttribute(Attribute.PROJECT_SELECTED, projectUser);
         return ResponseData.success();
     }
 }

@@ -17,7 +17,7 @@ import java.util.List;
 @Mapper
 public interface LogCollectMapper {
 
-    String COLUMN = " id, state, log_uuid, project_code, task_uuid, log_mode, log_level, client_identification," +
+    String COLUMN = " id, state, log_uuid, project_code, task_uuid, client_identification," +
             "log_time, gmt_created, gmt_modified ";
 
     String TABLE = " ${prefix}_log_collect ";

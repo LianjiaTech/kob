@@ -59,10 +59,10 @@
             <th data-hide="all">项目标识</th>
             <th data-hide="all">客户端IP</th>
             <th data-hide="all">客户端版本</th>
-            <th data-hide="all">客户端过期回收阈值(秒)</th>
-            <th data-hide="all">工作线程池负载因子</th>
-            <th data-hide="all">心跳周期</th>
-            <th data-hide="all">LOG WARN开关</th>
+            <#--<th data-hide="all">客户端过期回收阈值(秒)</th>-->
+            <#--<th data-hide="all">工作线程池负载因子</th>-->
+            <#--<th data-hide="all">心跳周期</th>-->
+            <#--<th data-hide="all">LOG WARN开关</th>-->
             <th data-hide="all">挂载作业详情</th>
             <th data-hide="all">正在执行的任务</th>
         </tr>
@@ -70,21 +70,21 @@
         <tbody>
         {{each rows as row index}}
         <tr>
-            <td>{{row.clientData.identification}}</td>
+            <td>{{row.clientPath.identification}}</td>
             <td>{{row.clientData.workers}}</td>
             <td>{{row.clientData.threads}}</td>
-            <td>{{row.clientData.tasks}}</td>
+            <td>{{row.clientPath.taskSize}}</td>
             <td>{{row.clientData.created | format:'timestampFormat',row.clientData.created}}</td>
             <td>{{row.clientData.modified | format:'timestampFormat',row.clientData.modified}}</td>
             <td>{{row.clientData.projectCode}}</td>
             <td>{{row.clientData.ip}}</td>
             <td>{{row.clientData.version}}</td>
-            <td>{{row.clientData.expireRecyclingTime}}</td>
-            <td>{{row.clientData.loadFactor}}</td>
-            <td>{{row.clientData.heartbeatPeriod}}</td>
-            <td>{{row.clientData.logWarnEnable}}</td>
-            <td>{{row.clientData.tasks}}</td>
-            <td>{{row.clientData.runningTask}}</td>
+            <#--<td>{{row.clientData.expireRecyclingTime}}</td>-->
+            <#--<td>{{row.clientData.loadFactor}}</td>-->
+            <#--<td>{{row.clientData.heartbeatPeriod}}</td>-->
+            <#--<td>{{row.clientData.logWarnEnable}}</td>-->
+            <td>{{row.clientPath.tasksDesc}}</td>
+            <td>{{row.clientData.runningTaskDesc}}</td>
         </tr>
         {{/each}}
         {{if results == 0}}
