@@ -1,10 +1,10 @@
 package com.ke.schedule.demo.monitor.task;
 
 import com.alibaba.fastjson.JSON;
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.basic.model.TaskResult;
 import com.ke.schedule.client.spring.annotation.KobSchedule;
 import com.ke.schedule.client.spring.annotation.Task;
-import com.ke.schedule.client.spring.model.TaskContext;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 @KobSchedule
 public @Slf4j class TaskClz {
 
-    @Task(key = "helloWorld", remark = "你好旅行者")
+    @Task(key = "helloWorld", remark = "哈喽")
     public TaskResult helloWorld(TaskContext context) {
         System.out.println("日志 =============");
         System.out.println("日志 =============");

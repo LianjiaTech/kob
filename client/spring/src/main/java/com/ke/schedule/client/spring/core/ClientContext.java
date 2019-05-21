@@ -3,7 +3,7 @@ package com.ke.schedule.client.spring.core;
 import com.alibaba.fastjson.JSON;
 import com.ke.schedule.basic.constant.ZkPathConstant;
 import com.ke.schedule.basic.model.ClientData;
-import com.ke.schedule.basic.model.TaskBaseContext;
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.basic.model.TaskResult;
 import com.ke.schedule.basic.model.ZkAuthInfo;
 import com.ke.schedule.basic.support.IpUtils;
@@ -11,7 +11,6 @@ import com.ke.schedule.basic.support.UuidUtils;
 import com.ke.schedule.client.spring.annotation.Task;
 import com.ke.schedule.client.spring.constant.ClientConstant;
 import com.ke.schedule.client.spring.constant.ClientLogConstant;
-import com.ke.schedule.client.spring.startup.ClientProperties;
 import javafx.util.Pair;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +31,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * @Author: zhaoyuguang
@@ -47,7 +45,7 @@ class ClientContext {
     private @Getter ZkClient zkClient;
     private @Getter String clientTaskPath;
     private @Getter String clientNodePath;
-    private @Getter Map<String, Pair<String, Function<TaskBaseContext, TaskResult>>> runner;
+    private @Getter Map<String, Pair<String, Function<TaskContext, TaskResult>>> runner;
     private @Getter ThreadPoolExecutor pool;
     private @Getter @Setter String adminUrl;
     private @Getter @Setter String zkConnect;

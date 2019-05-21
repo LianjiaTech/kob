@@ -4,11 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.constant.TaskRecordStateConstant;
 import com.ke.schedule.basic.constant.ZkPathConstant;
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.basic.model.TaskResult;
 import com.ke.schedule.basic.support.KobUtils;
 import com.ke.schedule.client.spring.constant.ClientLogConstant;
 import com.ke.schedule.client.spring.logger.OkHttpLogger;
-import com.ke.schedule.client.spring.model.TaskContext;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
@@ -69,10 +69,10 @@ enum TaskDispatcher {
                 try {
                     OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.RUNNER_START);
                     TaskResult result = client.getRunner().get(path.getTaskKey()).getValue().apply(context);
-                    OkHttpLogger.INSTANCE.systemLog(client, path, result.getState());//todo msg
+                    OkHttpLogger.INSTANCE.systemLog(client, path, result.getState(), result.getMsg());
                 } catch (Exception e) {
                     log.error(ClientLogConstant.error502(JSON.toJSONString(context), client.getData().getIdentification()), e);
-                    OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.EXECUTE_EXCEPTION);//todo e
+                    OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.EXECUTE_EXCEPTION, e);
                 }
             });
         }

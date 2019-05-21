@@ -3,7 +3,7 @@ package com.ke.schedule.server.processor.component;
 import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.constant.ZkPathConstant;
 import com.ke.schedule.basic.model.LockData;
-import com.ke.schedule.basic.model.TaskBaseContext;
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.basic.support.NamedThreadFactory;
 import com.ke.schedule.server.core.common.AdminConstant;
 import com.ke.schedule.server.core.common.AdminLogConstant;
@@ -111,14 +111,14 @@ class WaitingTask {
                 List<String> taskPathList = curator.getChildren().forPath(ZkPathConstant.clientTaskPath(zp, projectCode));
                 if (!CollectionUtils.isEmpty(taskPathList) && taskPathList.size() > 40) {
                     log.error("send qx");
-                    List<TaskBaseContext.Path> paths = new ArrayList<>();
+                    List<TaskContext.Path> paths = new ArrayList<>();
                     for (String s : taskPathList) {
-                        TaskBaseContext.Path path = JSONObject.parseObject(s, TaskBaseContext.Path.class);
+                        TaskContext.Path path = JSONObject.parseObject(s, TaskContext.Path.class);
                         path.setPath(s);
                         paths.add(path);
                     }
                     Collections.sort(paths);
-                    List<TaskBaseContext.Path> overstockTask = paths.subList(0, paths.size() - 30);
+                    List<TaskContext.Path> overstockTask = paths.subList(0, paths.size() - 30);
                     scheduleService.fireOverstockTask(overstockTask);
 
                 }

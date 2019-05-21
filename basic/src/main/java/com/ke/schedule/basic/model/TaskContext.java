@@ -8,17 +8,17 @@ import lombok.Setter;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-public class TaskBaseContext{
+public class TaskContext {
 
     private @Getter @Setter Path path;
     private @Getter @Setter Data data;
 
-    public TaskBaseContext() {
+    public TaskContext() {
         this.path = new Path();
         this.data = new Data();
     }
 
-    public TaskBaseContext(Path path, Data data) {
+    public TaskContext(Path path, Data data) {
         this.path = path;
         this.data = data;
     }
@@ -30,7 +30,7 @@ public class TaskBaseContext{
     /**
      * 定义ZK path信息
      */
-    public @NoArgsConstructor static class Path implements Comparable<TaskBaseContext.Path>{
+    public @NoArgsConstructor static class Path implements Comparable<TaskContext.Path>{
 
         /**
          * 任务方法

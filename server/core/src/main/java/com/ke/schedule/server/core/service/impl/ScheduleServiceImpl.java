@@ -140,7 +140,7 @@ class ScheduleServiceImpl implements ScheduleService {
 
     @Override
     public void pushTask0(TaskWaiting tw, String cluster) {
-        TaskBaseContext context = new TaskBaseContext();
+        TaskContext context = new TaskContext();
         context.getData().setProjectCode(tw.getProjectCode());
         context.getData().setJobUuid(tw.getJobUuid());
         context.getData().setJobCn(tw.getJobCn());
@@ -171,7 +171,7 @@ class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public void fireOverstockTask(List<TaskBaseContext.Path> overstockTask) {
+    public void fireOverstockTask(List<TaskContext.Path> overstockTask) {
         overstockTask.forEach(t -> {
             try {
                 curator.delete().forPath(t.getPath());
@@ -201,25 +201,25 @@ class ScheduleServiceImpl implements ScheduleService {
     @Override
     public void handleTaskLog(LogContext context, TaskRecord taskRecord) {
         Map<String, Object> param = new HashMap<>(20);
-        if (TaskRecordStateConstant.RECEIVE_SUCCESS == context.getTaskRecordState()) {
+        if (TaskRecordStateConstant.RECEIVE_SUCCESS == context.getState()) {
             param.put("clientIdentification", context.getClientIdentification());
             param.put("consumptionTime", new Date(context.getLogTime()));
-            param.put("state", context.getTaskRecordState());
+            param.put("state", context.getState());
         }
-        if (TaskRecordStateConstant.RUNNER_START == context.getTaskRecordState()) {
+        if (TaskRecordStateConstant.RUNNER_START == context.getState()) {
             param.put("executeStartTime", new Date(context.getLogTime()));
-            param.put("state", context.getTaskRecordState());
+            param.put("state", context.getState());
         }
-        if (TaskRecordStateConstant.EXECUTE_SUCCESS == context.getTaskRecordState()
-                || TaskRecordStateConstant.EXECUTE_FAIL == context.getTaskRecordState()
-                || TaskRecordStateConstant.EXECUTE_EXCEPTION == context.getTaskRecordState()) {
+        if (TaskRecordStateConstant.EXECUTE_SUCCESS == context.getState()
+                || TaskRecordStateConstant.EXECUTE_FAIL == context.getState()
+                || TaskRecordStateConstant.EXECUTE_EXCEPTION == context.getState()) {
             param.put("complete", true);
             param.put("executeEndTime", new Date(context.getLogTime()));
-            param.put("state", context.getTaskRecordState());
+            param.put("state", context.getState());
         }
         Boolean needAppendRetry = false;
         String appendRetryTaskUuid = null;
-        if (TaskRecordStateConstant.EXECUTE_FAIL == context.getTaskRecordState()) {
+        if (TaskRecordStateConstant.EXECUTE_FAIL == context.getState()) {
             if (taskRecord.getAncestor() && RetryType.FAIL.name().equals(taskRecord.getRetryType())) {
                 appendRetryTaskUuid = UuidUtils.builder(UuidUtils.AbbrType.AR);
                 InnerParams innerParams = taskRecord.getInnerParamsBean();
@@ -249,7 +249,7 @@ class ScheduleServiceImpl implements ScheduleService {
     private void handleRetryFailTask(LogContext logContext, TaskRecord taskRecord, String appendRetryTaskUuid) {
         TaskRecord retryTask = createRetryTaskRecord(logContext, taskRecord, appendRetryTaskUuid);
         taskRecordMapper.insertOne(retryTask, mp);
-        TaskBaseContext context = new TaskBaseContext();
+        TaskContext context = new TaskContext();
         context.getData().setProjectCode(retryTask.getProjectCode());
         context.getData().setJobUuid(retryTask.getJobUuid());
         context.getData().setJobCn(retryTask.getJobCn());
@@ -423,7 +423,7 @@ class ScheduleServiceImpl implements ScheduleService {
             throw new RuntimeException("server_code_error_101:插入任务记录数量不为1");
         }
 
-        TaskBaseContext context = new TaskBaseContext();
+        TaskContext context = new TaskContext();
         context.getData().setProjectCode(tw.getProjectCode());
         context.getData().setJobUuid(tw.getJobUuid());
         context.getData().setJobCn(tw.getJobCn());

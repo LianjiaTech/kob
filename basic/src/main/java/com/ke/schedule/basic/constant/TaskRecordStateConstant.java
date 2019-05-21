@@ -35,6 +35,7 @@ public class TaskRecordStateConstant {
      * 客户端任务超时回收（比如触发时间与客户端当前时间超过某一个阈值，就不执行并回收此任务）
      */
     public static final int EXPIRE_RECYCLING = 52;
+    public static final int SERVICE_LOG = 69;
     /**
      * 执行成功
      */

@@ -2,9 +2,10 @@ package com.ke.schedule.client.spring.core;
 
 
 import com.alibaba.fastjson.JSONObject;
+import com.ke.schedule.basic.constant.TaskRecordStateConstant;
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.client.spring.constant.ClientLogConstant;
 import com.ke.schedule.client.spring.logger.OkHttpLogger;
-import com.ke.schedule.client.spring.model.TaskContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -44,7 +45,7 @@ enum ClientFunction {
             String full = (String) objects[2];
             if (System.currentTimeMillis() - path.getTriggerTime() > client.getExpireRecyclingTime()) {
                 if (client.getZkClient().delete(full)) {
-                    OkHttpLogger.INSTANCE.expireRecycling(client, path);
+                    OkHttpLogger.INSTANCE.systemLog(client, path, TaskRecordStateConstant.EXPIRE_RECYCLING);
                     return true;
                 }
             }

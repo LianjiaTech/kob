@@ -2,56 +2,75 @@ package com.ke.schedule.client.spring.logger;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ke.schedule.basic.model.ClientData;
-import com.ke.schedule.basic.model.LogMode;
-import com.ke.schedule.basic.model.TaskBaseContext;
+import com.ke.schedule.basic.model.LogContext;
+import com.ke.schedule.basic.support.UuidUtils;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author zhaoyuguang
  */
 
 public class LoggerBuilder {
-    private JSONObject json = new JSONObject();
+    private LogContext log = new LogContext();
 
     public LoggerBuilder client(ClientData client) {
-        this.json.put(LogParam.client_id.name(), client.getIdentification());
-        this.json.put(LogParam.project.name(), client.getProjectCode());
-        this.json.put(LogParam.ip.name(), client.getIp());
-        this.json.put(LogParam.version.name(), client.getVersion());
-        this.json.put(LogParam.token.name(), client.getToken());
+        this.log.setClientIdentification(client.getIdentification());
+        this.log.setProjectCode(client.getProjectCode());
+        this.log.setIp(client.getIp());
+        this.log.setVersion(client.getVersion());
+        this.log.setToken(client.getToken());
         return this;
     }
 
-    public LoggerBuilder setLogMode(LogMode mode) {
-        this.json.put(LogParam.log_mode.name(), mode.name());
+    public LoggerBuilder setMessage(Throwable t) {
+        try {
+            if (t != null) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                t.printStackTrace(pw);
+                this.log.setMsg(sw.getBuffer().toString());
+                sw.close();
+                pw.close();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return this;
     }
+
 
     public LoggerBuilder setMessage(String msg) {
-        this.json.put(LogParam.msg.name(), msg);
+        this.log.setMsg(msg);
         return this;
     }
 
-    public LoggerBuilder setNow() {
-        this.json.put(LogParam.now.name(), System.currentTimeMillis());
+    public LoggerBuilder taskUuid(String taskUuid) {
+        this.log.setTaskUuid(taskUuid);
         return this;
     }
 
-
-
-    public LoggerBuilder path(TaskBaseContext.Path path) {
-        this.json.put(LogParam.task_uuid.name(), path.getTaskUuid());
+    public LoggerBuilder uuid() {
+        this.log.setLogUuid(UuidUtils.builder(UuidUtils.AbbrType.LU));
         return this;
     }
 
     public RequestBody build() {
         MediaType media = MediaType.parse("application/json; charset=utf-8");
-        return RequestBody.create(media, this.json.toJSONString());
+        return RequestBody.create(media, JSONObject.toJSONString(this));
     }
 
     public LoggerBuilder state(int state) {
-        this.json.put(LogParam.state.name(), state);
+        this.log.setState(state);
         return this;
     }
+
+    public LoggerBuilder now() {
+        this.log.setLogTime(System.currentTimeMillis());
+        return this;
+    }
+
 }

@@ -109,15 +109,15 @@
 ////        if (random100 < processorProperties.getTaskOverstockRecoveryWeight()) {
 ////            List<String> taskPathList = curator.getChildren(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode));
 ////            if (!KobUtils.isEmpty(taskPathList) && taskPathList.size() > processorProperties.getTaskOverstockRecoveryThreshold()) {
-////                List<TaskBaseContext> tasks = new ArrayList<>();
+////                List<TaskContext> tasks = new ArrayList<>();
 ////                for (String s : taskPathList) {
-////                    TaskBaseContext task = JSONObject.parseObject(s, TaskBaseContext.class);
+////                    TaskContext task = JSONObject.parseObject(s, TaskContext.class);
 ////                    //todo
 ////                    // task.setPath(ZkPathConstant.clientTaskPath(serverContext.getZp(), projectCode) + ZkPathConstant.BACKSLASH + s);
 ////                    tasks.add(task);
 ////                }
 ////                Collections.sort(tasks);
-////                List<TaskBaseContext> overstockTask = tasks.subList(0, tasks.size() - processorProperties.getTaskOverstockRecoveryRetainCount());
+////                List<TaskContext> overstockTask = tasks.subList(0, tasks.size() - processorProperties.getTaskOverstockRecoveryRetainCount());
 ////                scheduleService.fireOverstockTask(zkClient, overstockTask, serverContext.getZp());
 ////            }
 ////        }

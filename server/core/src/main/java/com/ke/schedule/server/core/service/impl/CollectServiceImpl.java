@@ -1,6 +1,7 @@
 package com.ke.schedule.server.core.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ke.schedule.basic.constant.TaskRecordStateConstant;
 import com.ke.schedule.server.core.mapper.LogCollectMapper;
 import com.ke.schedule.server.core.mapper.TaskRecordMapper;
 import com.ke.schedule.server.core.model.db.LogCollect;
@@ -35,7 +36,6 @@ public @Slf4j class CollectServiceImpl implements CollectService {
 
     @Override
     public void handleLogger(LogContext context) {
-        String cluster = context.getCluster();
         String taskUuid = context.getTaskUuid();
         TaskRecord taskRecord = taskRecordMapper.findByTaskUuid(taskUuid, mp);
         System.out.println("tr =" + JSONObject.toJSONString(taskRecord));
@@ -44,17 +44,15 @@ public @Slf4j class CollectServiceImpl implements CollectService {
             return;
         }
         LogCollect logCollect = new LogCollect();
-        logCollect.setState(context.getTaskRecordState());
+        logCollect.setState(context.getState());
         logCollect.setLogUuid(context.getLogUuid());
         logCollect.setProjectCode(context.getProjectCode());
         logCollect.setTaskUuid(context.getTaskUuid());
-        logCollect.setLogMode(context.getLogMode());
-        logCollect.setLogLevel(KobUtils.isEmpty(context.getLogLevel())?"":context.getLogLevel());
         logCollect.setClientIdentification(context.getClientIdentification());
         logCollect.setLogTime(new Date(context.getLogTime()));
 
-        logCollectMapper.insertOne(logCollect, cluster);
-        if (LogMode.SYSTEM.name().equals(context.getLogMode())) {
+        logCollectMapper.insertOne(logCollect, mp);
+        if (context.getState()!=null && TaskRecordStateConstant.SERVICE_LOG!=context.getState()) {
             scheduleService.handleTaskLog(context, taskRecord);
         }
     }

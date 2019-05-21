@@ -1,12 +1,11 @@
 package com.ke.schedule.server.core.service;
 
+import com.ke.schedule.basic.model.TaskContext;
 import com.ke.schedule.server.core.model.db.JobCron;
 import com.ke.schedule.server.core.model.db.TaskRecord;
 import com.ke.schedule.server.core.model.db.TaskWaiting;
 import com.ke.schedule.basic.model.LogContext;
-import com.ke.schedule.basic.model.TaskBaseContext;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +27,7 @@ public interface ScheduleService {
 
     Boolean lockPushTask(TaskWaiting tw, String cluster, String serverIdentification);
 
-    void fireOverstockTask(List<TaskBaseContext.Path> overstockTask);
+    void fireOverstockTask(List<TaskContext.Path> overstockTask);
 
     int selectCountExpireTaskRecord(long now, String cluster);
 

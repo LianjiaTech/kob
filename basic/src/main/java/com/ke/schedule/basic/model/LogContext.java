@@ -10,14 +10,14 @@ public @NoArgsConstructor @Getter @Setter class LogContext implements Serializab
 
     private static final long serialVersionUID = -6918526595897276922L;
 
-    private Integer taskRecordState;
+    private Integer state;
     private String projectCode;
-    private String cluster;
+    private String ip;
     private String logUuid;
     private String taskUuid;
-    private String logMode;
-    private String logLevel;
+    private String token;
     private String clientIdentification;
     private String msg;
+    private String version;
     private Long logTime;
 }
