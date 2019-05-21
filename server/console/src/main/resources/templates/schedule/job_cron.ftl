@@ -52,7 +52,7 @@
             <th>CRON表达式</th>
             <th>路由规则</th>
             <th>上一周期</th>
-            <th>批处理</th>
+            <#--<th>批处理</th>-->
             <th>状态</th>
             <th>操作</th>
             <th data-hide="all">所属项目</th>
@@ -73,7 +73,7 @@
             <td>{{row.cronExpression}}</td>
             <td>{{row.loadBalance | format:'loadBalanceFormat',row.loadBalance}}</td>
             <td>{{row.rely | format:'relyFormat',row.rely}}</td>
-            <td>{{row.batchType | format:'batchTypeFormat',row.batchType}}</td>
+            <#--<td>{{row.batchType | format:'batchTypeFormat',row.batchType}}</td>-->
             <td>{{row.suspend | format:'suspendFormat',row.suspend}}</td>
             <td>{{row.opt | format:'optFormat',row}}</td>
             <td>{{row.projectName}} - {{row.projectCode}}</td>
@@ -87,13 +87,13 @@
         {{/each}}
         {{if results == 0}}
         <tr>
-            <td colspan="16">暂无数据</td>
+            <td colspan="15">暂无数据</td>
         </tr>
         {{/if}}
         </tbody>
         <tfoot>
         <tr>
-            <td colspan="16">
+            <td colspan="15">
                 <span>共{{results}}条记录，每页展示{{pageSize}}条</span>
                 <ul class="pagination-sm pull-right"></ul>
             </td>

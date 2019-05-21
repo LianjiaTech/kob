@@ -76,6 +76,11 @@ public interface ProjectUserMapper {
             "where user_code = #{userCode} " +
             "order by id desc ")
     List<ProjectUser> selectByUserCode(@Param("userCode") String userCode, @Param("prefix") String prefix);
+    @Select("select " + COLUMN +
+            "from " + TABLE +
+            "where project_code = #{projectCode} " +
+            "order by id desc ")
+    List<ProjectUser> selectByProjectCode(@Param("projectCode") String projectCode, @Param("prefix") String prefix);
 
     /**
      * 项目删除用户

@@ -18,6 +18,7 @@ import com.ke.schedule.server.core.model.db.TaskRecord;
 import com.ke.schedule.server.core.model.db.TaskWaiting;
 import com.ke.schedule.server.core.model.oz.BatchType;
 import com.ke.schedule.server.core.model.oz.RetryType;
+import com.ke.schedule.server.core.service.AlarmService;
 import com.ke.schedule.server.core.service.ScheduleService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -49,6 +50,8 @@ class ScheduleServiceImpl implements ScheduleService {
     private ProjectUserMapper projectUserMapper;
     @Resource
     private CuratorFramework curator;
+    @Resource
+    private AlarmService alarmService;
     @Value("${kob-schedule.zk-prefix}")
     private String zp;
     @Value("${kob-schedule.mysql-prefix}")
@@ -207,12 +210,14 @@ class ScheduleServiceImpl implements ScheduleService {
             param.put("state", context.getState());
         }
         if (TaskRecordStateConstant.RUNNER_START == context.getState()) {
+            alarmService.run(taskRecord);
             param.put("executeStartTime", new Date(context.getLogTime()));
             param.put("state", context.getState());
         }
         if (TaskRecordStateConstant.EXECUTE_SUCCESS == context.getState()
                 || TaskRecordStateConstant.EXECUTE_FAIL == context.getState()
                 || TaskRecordStateConstant.EXECUTE_EXCEPTION == context.getState()) {
+            alarmService.end(taskRecord);
             param.put("complete", true);
             param.put("executeEndTime", new Date(context.getLogTime()));
             param.put("state", context.getState());
@@ -438,6 +443,7 @@ class ScheduleServiceImpl implements ScheduleService {
         int state = TaskRecordStateConstant.PUSH_SUCCESS;
         Map<String, Object> param = new HashMap<>(10);
         try {
+            alarmService.send(taskRecord);
             curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT).forPath(projectTaskPath + ZkPathConstant.BACKSLASH + context.getZkPath(), JSONObject.toJSONString(context.getData()).getBytes());
         } catch (Exception e) {
             log.error("pushTask_error 推送zk事件异常", e);

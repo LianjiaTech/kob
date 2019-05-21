@@ -49,6 +49,8 @@ class ManagerController {
     private ProjectUserMapper projectUserMapper;
     @Value("${kob-schedule.zk-prefix}")
     private String zp;
+    @Value("${kob-schedule.mysql-prefix}")
+    private String mp;
 
     /**
      * 项目接入 view入口
@@ -203,7 +205,7 @@ class ManagerController {
         userConfiguration.setRun(run);
         userConfiguration.setEnd(end);
         projectUser.setConfiguration(JSONObject.toJSONString(userConfiguration));
-        projectUserMapper.updateConfiguration(projectUser, zp);
+        projectUserMapper.updateConfiguration(projectUser, mp);
         request.getSession().setAttribute(Attribute.PROJECT_SELECTED, projectUser);
         return ResponseData.success();
     }
