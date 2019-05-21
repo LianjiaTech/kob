@@ -55,7 +55,7 @@
                                         <option value="FAIL">失败重试</option>
                                     </select>
                                 </div>
-                                <div class="form-group input-group">
+                                <div class="form-group input-group" style="display: none">
                                     <span class="input-group-addon">批处理任务</span>
                                     <select name="batch_type" class="form-control selectpicker" disabled>
                                         <option value="NONE" selected>关闭</option>
