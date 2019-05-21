@@ -59,7 +59,7 @@
             <th>上报节点</th>
             <th>上报状态</th>
             <th>任务标识</th>
-            <th>日志模式</th>
+            <#--<th>日志模式</th>-->
             <th data-hide="all">项目标识</th>
             <th data-hide="all">日志标识</th>
             <th data-hide="all">回传结果</th>
@@ -72,7 +72,7 @@
             <td>{{row.clientIdentification}}</td>
             <td>{{row.state | format:'stateFormat',row.state}}</td>
             <td>{{row.taskUuid}}</td>
-            <td>{{row.logMode}}</td>
+            <#--<td>{{row.logMode}}</td>-->
             <td>{{row.projectCode}}</td>
             <td>{{row.logUuid}}</td>
             <td>{{row.msg}}</td>
