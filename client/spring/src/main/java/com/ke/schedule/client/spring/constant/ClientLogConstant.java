@@ -12,7 +12,7 @@ import java.util.Map;
  * @Author: zhaoyuguang
  * @Date: 2018/7/31 下午7:39
  */
-
+@Deprecated
 public class ClientLogConstant {
     public static String error500(String error) {
         String log = "\n" +

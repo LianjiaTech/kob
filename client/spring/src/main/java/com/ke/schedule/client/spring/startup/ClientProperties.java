@@ -28,9 +28,6 @@ public @NoArgsConstructor @Getter @Setter class ClientProperties {
     private Integer threads;
     private List<ZkAuthInfo> zkAuthInfo;
     private Boolean logWarnEnable;
-    /**
-     * 需要大于等于30秒 才生效
-     */
     private Integer expireRecyclingSec;
     private Double loadFactor;
     private Long initialDelay;

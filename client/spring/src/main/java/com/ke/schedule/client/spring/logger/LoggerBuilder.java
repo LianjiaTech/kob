@@ -42,7 +42,6 @@ public class LoggerBuilder {
         return this;
     }
 
-
     public LoggerBuilder setMessage(String msg) {
         this.log.setMsg(msg);
         return this;

@@ -21,6 +21,11 @@ public @Slf4j class TaskClz {
         System.out.println("日志 =============");
         System.out.println("日志 =============");
         System.out.println(JSON.toJSONString(context));
+        try {
+            Thread.sleep(3000L);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return TaskResult.success();
     }
 }

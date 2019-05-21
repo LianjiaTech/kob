@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 
 public @Slf4j
 enum ClientFunction {
+
     //INSTANCE
     INSTANCE;
 
