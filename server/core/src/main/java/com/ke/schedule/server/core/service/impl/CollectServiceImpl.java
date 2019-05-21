@@ -48,6 +48,7 @@ public @Slf4j class CollectServiceImpl implements CollectService {
         logCollect.setLogUuid(context.getLogUuid());
         logCollect.setProjectCode(context.getProjectCode());
         logCollect.setTaskUuid(context.getTaskUuid());
+        logCollect.setIp(context.getIp());
         logCollect.setClientIdentification(context.getClientIdentification());
         logCollect.setLogTime(new Date(context.getLogTime()));
 

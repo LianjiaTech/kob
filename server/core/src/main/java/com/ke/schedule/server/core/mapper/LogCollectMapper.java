@@ -30,10 +30,10 @@ public interface LogCollectMapper {
      * @return 影响行数
      */
     @Insert("insert into " + TABLE +
-            "(state, log_uuid, project_code, task_uuid, log_mode, log_level, " +
+            "(state, log_uuid, project_code, task_uuid, " +
             "client_identification, log_time, msg) " +
             "values " +
-            "(#{lc.state}, #{lc.logUuid}, #{lc.projectCode}, #{lc.taskUuid}, #{lc.logMode}, #{lc.logLevel}, " +
+            "(#{lc.state}, #{lc.logUuid}, #{lc.projectCode}, #{lc.taskUuid}, " +
             "#{lc.clientIdentification}, #{lc.logTime}, #{lc.msg}) ")
     int insertOne(@Param("lc") LogCollect logCollect, @Param("prefix") String prefix);
 

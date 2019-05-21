@@ -19,8 +19,7 @@ public @NoArgsConstructor @Getter @Setter class LogCollect implements Serializab
     private String logUuid;
     private String projectCode;
     private String taskUuid;
-    private String logMode;
-    private String logLevel;
+    private String ip;
     private String clientIdentification;
     private Date logTime;
     private String msg;

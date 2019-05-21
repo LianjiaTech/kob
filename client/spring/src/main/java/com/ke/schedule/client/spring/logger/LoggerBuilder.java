@@ -60,7 +60,7 @@ public class LoggerBuilder {
 
     public RequestBody build() {
         MediaType media = MediaType.parse("application/json; charset=utf-8");
-        return RequestBody.create(media, JSONObject.toJSONString(this));
+        return RequestBody.create(media, JSONObject.toJSONString(this.log));
     }
 
     public LoggerBuilder state(int state) {

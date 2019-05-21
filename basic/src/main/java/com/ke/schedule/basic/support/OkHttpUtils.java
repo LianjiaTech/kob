@@ -23,6 +23,7 @@ public @Slf4j class OkHttpUtils {
         Request request = (new Request.Builder()).url(url).post(body).build();
 
         try {
+            log.info("Http Post请求数据,url:" + url + ", body:" + JSONObject.toJSONString(body));
             return okHttpClient.newCall(request).execute();
         } catch (IOException var4) {
             log.error("Http Post请求失败,url:" + url + ", body:" + JSONObject.toJSONString(body), var4);
