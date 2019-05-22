@@ -10,6 +10,7 @@ public class ZkPathConstant {
     public static final String CONFIG = "/config";
     public static final String CRON = "/cron";
     public static final String WAIT = "/wait";
+    public static final String EXPIRE = "/expire";
 
     public static String clientTaskPath(String zp, String pc) {
         return BACKSLASH + zp + CLIENT + BACKSLASH + pc + TASK;
@@ -33,5 +34,9 @@ public class ZkPathConstant {
 
     public static String serverWaitPath(String zp) {
         return BACKSLASH + zp + SERVER + CONFIG + WAIT;
+    }
+
+    public static String serverExpirePath(String zp) {
+        return BACKSLASH + zp + SERVER + CONFIG + EXPIRE;
     }
 }

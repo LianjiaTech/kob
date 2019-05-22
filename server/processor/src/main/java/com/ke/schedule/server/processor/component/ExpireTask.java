@@ -46,7 +46,7 @@ class ExpireTask {
 
     private void pushWaitingTask() {
         boolean create = false;
-        String path = ZkPathConstant.serverWaitPath(zp);
+        String path = ZkPathConstant.serverExpirePath(zp);
         try {
             System.out.println("WAITING_TASK_EXECUTOR");
             try {
