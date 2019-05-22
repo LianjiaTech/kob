@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -25,8 +26,7 @@ import java.util.concurrent.TimeUnit;
  * @author zhaoyuguang
  */
 @Component
-public @Slf4j
-class ExpireTask {
+public @Slf4j class ExpireTask {
 
     @Resource(name = "scheduleService")
     private ScheduleService scheduleService;
@@ -85,7 +85,15 @@ class ExpireTask {
                 int start = expireCount / 100 * 100;
                 int limit = expireCount - start;
                 do {
-                    List<TaskRecord> taskExpireList = scheduleService.selectListExpireTaskRecord(now, start, limit, mp);
+                    List<TaskRecord> taskRunnerList = scheduleService.selectListExpireTaskRecord(start, limit, mp);
+                    List<TaskRecord> taskExpireList = new ArrayList<>();
+                    if (CollectionUtils.isEmpty(taskRunnerList)) {
+                        taskRunnerList.forEach(e -> {
+                            if ((e.getTriggerTime() + e.getTimeoutThreshold() * 1000L) > System.currentTimeMillis()) {
+                                taskExpireList.add(e);
+                            }
+                        });
+                    }
                     if (CollectionUtils.isEmpty(taskExpireList)) {
                         start = start - 100;
                         limit = 100;

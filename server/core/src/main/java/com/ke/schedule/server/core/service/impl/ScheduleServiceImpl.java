@@ -191,8 +191,8 @@ class ScheduleServiceImpl implements ScheduleService {
     }
 
     @Override
-    public List<TaskRecord> selectListExpireTaskRecord(long now, int start, int limit, String cluster) {
-        return taskRecordMapper.selectListExpireTaskRecord(System.currentTimeMillis(), start, limit, cluster);
+    public List<TaskRecord> selectListExpireTaskRecord(int start, int limit, String cluster) {
+        return taskRecordMapper.selectListExpireTaskRecord(start, limit, cluster);
     }
 
     @Override

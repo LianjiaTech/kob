@@ -31,7 +31,7 @@ public interface ScheduleService {
 
     int selectCountExpireTaskRecord(long now, String cluster);
 
-    List<TaskRecord> selectListExpireTaskRecord(long now, int start, int limit, String cluster);
+    List<TaskRecord> selectListExpireTaskRecord(int start, int limit, String cluster);
 
     void handleExpireTask(TaskRecord taskExpire, String cluster);
 

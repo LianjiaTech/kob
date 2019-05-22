@@ -17,11 +17,14 @@ public class Kernel implements InitializingBean {
     private WaitingTask waitingTask;
     @Resource
     private Heartbeat heartbeat;
+    @Resource
+    private ExpireTask expireTask;
 
     @Override
     public void afterPropertiesSet() {
         cornTask.initialize();
         waitingTask.initialize();
         heartbeat.initialize();
+        expireTask.initialize();
     }
 }

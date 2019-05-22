@@ -56,10 +56,10 @@ public interface TaskRecordMapper {
 
     @Select("select " + COLUMN +
             "from " + TABLE +
-            "where complete = 0 and trigger_time+timeout_threshold*1000 < #{now} " +
+            "where state = " + TaskRecordStateConstant.EXECUTE_SUCCESS +
             "order by id desc " +
             "limit ${start}, ${limit} ")
-    List<TaskRecord> selectListExpireTaskRecord(@Param("now") long now, @Param("start") int start, @Param("limit") int limit, @Param("prefix") String prefix);
+    List<TaskRecord> selectListExpireTaskRecord(@Param("start") int start, @Param("limit") int limit, @Param("prefix") String prefix);
 
     @Update("<script>" +
             "   update " + TABLE +

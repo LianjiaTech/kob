@@ -42,10 +42,6 @@ class WaitingTask {
     @Resource
     private CuratorFramework curator;
     @Resource
-    private TaskWaitingMapper taskWaitingMapper;
-    @Resource
-    private TaskRecordMapper taskRecordMapper;
-    @Resource
     private ServerContext context;
 
     @Value("${kob-schedule.zk-prefix}")
@@ -78,7 +74,6 @@ class WaitingTask {
             curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
             create = true;
             pushWaitingTask0();
-
         } catch (Exception e) {
             log.error(AdminLogConstant.error9100(), e);
         }
