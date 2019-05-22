@@ -41,10 +41,10 @@ class ExpireTask {
     private static final ScheduledExecutorService WAITING_TASK_EXECUTOR = new ScheduledThreadPoolExecutor(1, new NamedThreadFactory("waiting-task", true));
 
     void initialize() {
-        WAITING_TASK_EXECUTOR.scheduleAtFixedRate(() -> pushWaitingTask(), 2000, 1000, TimeUnit.MILLISECONDS);
+        WAITING_TASK_EXECUTOR.scheduleAtFixedRate(() -> fireExpireTask(), 2000, 1000, TimeUnit.MILLISECONDS);
     }
 
-    private void pushWaitingTask() {
+    private void fireExpireTask() {
         boolean create = false;
         String path = ZkPathConstant.serverExpirePath(zp);
         try {
@@ -63,7 +63,7 @@ class ExpireTask {
             LockData lock = new LockData(context.getNode().getIdentification(), System.currentTimeMillis() + 1000 * 20);
             curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
             create = true;
-            fireExpireTask();
+            fireExpireTask0();
 
         } catch (Exception e) {
             log.error(AdminLogConstant.error9100(), e);
@@ -77,7 +77,7 @@ class ExpireTask {
         }
     }
 
-    private void fireExpireTask() {
+    private void fireExpireTask0() {
         try {
             long now = System.currentTimeMillis();
             int expireCount = scheduleService.selectCountExpireTaskRecord(now, zp);
