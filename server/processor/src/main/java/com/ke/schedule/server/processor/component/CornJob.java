@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author zhaoyuguang
@@ -48,50 +49,23 @@ class CornJob {
     }
 
     private void initializeCornTask() {
-        boolean create = false;
-        try {
-            System.out.println("CRON_TASK_EXECUTOR");
-            String path = ZkPathConstant.serverCronPath(zp);
-            try {
-                byte[] b = curator.getData().forPath(path);
-                LockData exitLock = JSONObject.parseObject(new String(b), LockData.class);
-                if (exitLock.getExpire() < System.currentTimeMillis()) {
-                    curator.delete().forPath(path);
-                } else {
-                    return;
-                }
-            } catch (KeeperException.NoNodeException e) {
-
-            }
-            LockData lock = new LockData(context.getNode().getIdentification(), System.currentTimeMillis() + 1000 * 60 * 5);
-            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
-            create = true;
-            jobCronGenerateWaitingTask();
-
-        } catch (Exception e) {
-            log.error(AdminLogConstant.error9100(), e);
-        }
-        if (create) {
-            try {
-                curator.delete().forPath(ZkPathConstant.serverCronPath(zp));
-            } catch (Exception e) {
-                log.error(AdminLogConstant.error9100(), e);
-            }
-        }
+        LockConsumer.INSTANCE.lock(jobCronGenerateWaitingTask(), curator, context.getNode().getIdentification(), ZkPathConstant.serverCronPath(zp)).accept(null);
     }
 
-    private void jobCronGenerateWaitingTask() {
-        List<JobCron> jobCronList = scheduleService.findRunningCronJob(mp);
-        if (!KobUtils.isEmpty(jobCronList)) {
-            Date now = new Date();
-            jobCronList.forEach(c -> {
-                try {
-                    scheduleService.createCronWaitingTaskForTime(context.getNode().getIdentification(), c, false, 10, now);
-                } catch (Exception e) {
-                    log.error(AdminLogConstant.error9101(JSONObject.toJSONString(c)), e);
-                }
-            });
-        }
+    private Consumer<Object> jobCronGenerateWaitingTask() {
+        return o -> {
+            List<JobCron> jobCronList = scheduleService.findRunningCronJob(mp);
+            if (!KobUtils.isEmpty(jobCronList)) {
+                Date now = new Date();
+                jobCronList.forEach(c -> {
+                    try {
+                        scheduleService.createCronWaitingTaskForTime(context.getNode().getIdentification(), c, false, 10, now);
+                    } catch (Exception e) {
+                        log.error(AdminLogConstant.error9101(JSONObject.toJSONString(c)), e);
+                    }
+                });
+            }
+        };
     }
 
 }

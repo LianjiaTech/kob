@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * @author zhaoyuguang
@@ -55,49 +56,21 @@ class WaitingTask {
     }
 
     private void pushWaitingTask() {
-        boolean create = false;
-        String path = ZkPathConstant.serverWaitPath(zp);
-        try {
-            System.out.println("WAITING_TASK_EXECUTOR");
-            try {
-                byte[] b = curator.getData().forPath(path);
-                LockData exitLock = JSONObject.parseObject(new String(b), LockData.class);
-                if (exitLock.getExpire() < System.currentTimeMillis()) {
-                    curator.delete().forPath(path);
-                } else {
-                    return;
-                }
-            } catch (KeeperException.NoNodeException e) {
-
-            }
-            LockData lock = new LockData(context.getNode().getIdentification(), System.currentTimeMillis() + 1000 * 20);
-            curator.create().creatingParentsIfNeeded().withMode(CreateMode.EPHEMERAL).forPath(path, JSONObject.toJSONString(lock).getBytes());
-            create = true;
-            pushWaitingTask0();
-        } catch (Exception e) {
-            log.error(AdminLogConstant.error9100(), e);
-        }
-        if (create) {
-            try {
-                curator.delete().forPath(path);
-            } catch (Exception e) {
-                log.error(AdminLogConstant.error9100(), e);
-            }
-        }
+        LockConsumer.INSTANCE.lock(pushWaitingTask0(), curator, context.getNode().getIdentification(), ZkPathConstant.serverWaitPath(zp)).accept(null);
     }
 
-    private void pushWaitingTask0() {
-        long now = System.currentTimeMillis();
-        List<TaskWaiting> taskWaitingList = scheduleService.findTriggerTaskInLimit(now, 100, mp);
-        if (!CollectionUtils.isEmpty(taskWaitingList)) {
-            taskWaitingList.forEach(e -> {
-                recoveryOverstockTask(e.getProjectCode());
-                boolean finish = scheduleService.pushTask(e, context.getNode().getIdentification());
-            });
-        }
+    private Consumer<Object> pushWaitingTask0() {
+        return o -> {
+            long now = System.currentTimeMillis();
+            List<TaskWaiting> taskWaitingList = scheduleService.findTriggerTaskInLimit(now, 100, mp);
+            if (!CollectionUtils.isEmpty(taskWaitingList)) {
+                taskWaitingList.forEach(e -> {
+                    recoveryOverstockTask(e.getProjectCode());
+                    boolean finish = scheduleService.pushTask(e, context.getNode().getIdentification());
+                });
+            }
+        };
     }
-
-
 
     private void recoveryOverstockTask(String projectCode) {
         try {
@@ -115,7 +88,6 @@ class WaitingTask {
                     Collections.sort(paths);
                     List<TaskContext.Path> overstockTask = paths.subList(0, paths.size() - 30);
                     scheduleService.fireOverstockTask(overstockTask);
-
                 }
             }
         } catch (Exception e) {
