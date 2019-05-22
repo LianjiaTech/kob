@@ -10,6 +10,9 @@ kob-schedule-client:
   threads: 10
   zk-session-timeout: 4000
   zk-connection-timeout: 4000
+  zk-auth-info:
+    - scheme: 1
+      auth: 2
 
 #kob.client:
 #  env: official_develop

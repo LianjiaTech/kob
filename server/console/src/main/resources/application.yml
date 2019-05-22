@@ -26,6 +26,7 @@ debug: false
 
 kob-schedule:
   zk-connect-string: localhost:2181
+  zk-auth-info: 123
   zk-prefix: kob
   mysql-prefix: kob
 
