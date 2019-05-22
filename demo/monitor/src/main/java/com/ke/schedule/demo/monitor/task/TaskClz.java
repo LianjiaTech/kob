@@ -26,6 +26,6 @@ public @Slf4j class TaskClz {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return TaskResult.success();
+        return TaskResult.success("helloWorld");
     }
 }
