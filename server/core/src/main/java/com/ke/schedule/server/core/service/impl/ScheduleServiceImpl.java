@@ -77,6 +77,7 @@ class ScheduleServiceImpl implements ScheduleService {
         taskWaiting.setTaskType(TaskType.NONE.name());
         taskWaiting.setLoadBalance(jobCron.getLoadBalance());
         taskWaiting.setTaskUuid(taskUuid);
+        taskWaiting.setAncestor(true);
         taskWaiting.setRelationTaskUuid(taskUuid);
         taskWaiting.setRetryType(jobCron.getRetryType());
         taskWaiting.setRely(jobCron.getRely());

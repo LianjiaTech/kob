@@ -38,6 +38,8 @@ public @NoArgsConstructor @Getter @Setter class TaskWaiting implements Serializa
 
     private String taskUuid;
 
+    private Boolean ancestor;
+
     private String relationTaskUuid;
 
     private String retryType;

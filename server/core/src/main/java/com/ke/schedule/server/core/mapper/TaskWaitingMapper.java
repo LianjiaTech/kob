@@ -14,10 +14,6 @@ import java.util.List;
 @Mapper
 public interface TaskWaitingMapper {
 
-    String column = " id, project_code, project_name, job_uuid, job_type, job_cn, task_key, task_remark, task_type, " +
-            "task_uuid, load_balance, batch_type, retry_type, rely, user_params, inner_params, cron_expression, " +
-            "timeout_threshold, retry_count, failover, trigger_time, gmt_created, gmt_modified ";
-
     String table = " ${prefix}_task_waiting ";
 
     /**
@@ -49,7 +45,7 @@ public interface TaskWaitingMapper {
      * @param limit       限定条数
      * @return 可以出发任务list
      */
-    @Select("select " + column +
+    @Select("select * " +
             "from " + table +
             "where trigger_time <= #{triggerTime} " +
             "limit ${limit} ")
@@ -67,13 +63,13 @@ public interface TaskWaitingMapper {
     @Insert("<script>" +
             "   insert into " + table +
             "   (project_code, project_name, job_type, task_type, job_uuid, job_cn," +
-            "   task_uuid, relation_task_uuid, task_key, task_remark, cron_expression, " +
+            "   task_uuid, ancestor, relation_task_uuid, task_key, task_remark, cron_expression, " +
             "   load_balance, retry_type, batch_type, rely, retry_count, failover, " +
             "   timeout_threshold, user_params, inner_params, trigger_time)" +
             "   values" +
             "   <foreach collection='tws' item='tw' separator=','>" +
             "      (#{tw.projectCode}, #{tw.projectName}, #{tw.jobType}, #{tw.taskType}, #{tw.jobUuid}, #{tw.jobCn}," +
-            "      #{tw.taskUuid}, #{tw.relationTaskUuid}, #{tw.taskKey}, #{tw.taskRemark}, #{tw.cronExpression}, " +
+            "      #{tw.taskUuid}, #{tw.ancestor}, #{tw.relationTaskUuid}, #{tw.taskKey}, #{tw.taskRemark}, #{tw.cronExpression}, " +
             "      #{tw.loadBalance}, #{tw.retryType}, #{tw.batchType}, #{tw.rely}, #{tw.retryCount},  #{tw.failover}, " +
             "      #{tw.timeoutThreshold}, #{tw.userParams}, #{tw.innerParams}, #{tw.triggerTime}) " +
             "   </foreach>" +
@@ -118,7 +114,7 @@ public interface TaskWaitingMapper {
      * @param prefix
      * @return
      */
-    @Select("select " + column +
+    @Select("select * " +
             "from " + table +
             "where project_code = #{projectCode} " +
             "order by trigger_time asc " +
