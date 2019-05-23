@@ -48,7 +48,7 @@ public @Slf4j class ExpireTask {
         return o -> {
             try {
                 long now = System.currentTimeMillis();
-                int expireCount = scheduleService.selectCountExpireTaskRecord(now, zp);
+                int expireCount = scheduleService.selectCountExpireTaskRecord(now, mp);
                 if (expireCount > 0) {
                     int start = expireCount / 100 * 100;
                     int limit = expireCount - start;
